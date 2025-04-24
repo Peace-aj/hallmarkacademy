@@ -29,7 +29,7 @@ const Header: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const itemRenderer: NonNullable<MenuItem['template']> = (item, options) => {
+    const itemRenderer: NonNullable<MenuItem['template']> = (item) => {
         const custom = item as CustomMenuItem;
         if (custom.root) {
             return (
@@ -51,7 +51,7 @@ const Header: React.FC = () => {
                     className="flex flex-col gap-3"
                 /* onClick={(e) => options.onClick(e)} */
                 >
-                    <img src={custom.image} alt={custom.label} className="w-full" />
+                    <Image src={custom.image} alt={`${custom.label}`} className="w-full" />
                     {custom.subtext && <span>{custom.subtext}</span>}
                     <Button label={custom.label} className="p-button-outlined" />
                 </Link>

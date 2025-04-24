@@ -19,7 +19,7 @@ const newsData: NewsItem[] = [
         date: 'April 15, 2025',
         description:
             'Our students showcased exceptional talent at the regional science fair, bringing home multiple awards.',
-        image: require('@/assets/student.jpg'),
+        image: '/assets/student.jpg',
     },
     {
         id: 2,
@@ -27,7 +27,7 @@ const newsData: NewsItem[] = [
         date: 'March 30, 2025',
         description:
             'A day filled with enthusiasm and sportsmanship as students participated in various athletic events.',
-        image: require('@/assets/student.jpg'),
+        image: '/assets/student.jpg',
     },
     {
         id: 3,
@@ -35,7 +35,7 @@ const newsData: NewsItem[] = [
         date: 'March 10, 2025',
         description:
             'We proudly opened our state-of-the-art library, providing students with a vast collection of resources.',
-        image: require('@/assets/student.jpg'),
+        image: '/assets/student.jpg',
     },
     {
         id: 4,
@@ -43,7 +43,7 @@ const newsData: NewsItem[] = [
         date: 'February 25, 2025',
         description:
             'Our budding artists displayed their masterpieces, reflecting the vibrant creativity nurtured at our academy.',
-        image: require('@/assets/student.jpg'),
+        image: '/assets/student.jpg',
     },
 ];
 

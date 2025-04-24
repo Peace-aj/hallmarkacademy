@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "primereact/button";
 
-import wave from '@/assets/waves.svg';
 import heroImage from "@/assets/students2.jpg";
 import Flare from "@/components/ui/flare/flare";
 
@@ -47,7 +46,7 @@ const Hero = () => {
 
             <div className="absolute left-0 mt-88 w-full z-10">
                 <Flare
-                    imageSrc={wave}
+                    imageSrc={`/assets/waves.svg`}
                     alt="wave"
                 />
             </div>
