@@ -29,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <PrimeReactProvider value={{ unstyled: false }}>
-      <ClerkProvider>
+    <ClerkProvider>
+      <PrimeReactProvider value={{ unstyled: false }}>
         <html lang="en">
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -38,7 +38,7 @@ export default function RootLayout({
             {children}
           </body>
         </html>
-      </ClerkProvider>
-    </PrimeReactProvider>
+      </PrimeReactProvider>
+    </ClerkProvider>
   );
 }

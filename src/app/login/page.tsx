@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs/";
 import { useRouter } from "next/navigation";
 import * as Clerk from "@clerk/elements/common";
 import * as SignIn from "@clerk/elements/sign-in";
@@ -10,43 +10,25 @@ import Link from "next/link";
 
 import Footer from "@/components/ui/footer/footer";
 
-const Login: React.FC = () => {
+const Login = () => {
     const { isLoaded, isSignedIn, user } = useUser();
     const router = useRouter();
 
-    // Only attempt redirect after Clerk has loaded and user is signed in
     useEffect(() => {
-        console.log("isLoaded:", isLoaded);
-        console.log("isSignedIn:", isSignedIn);
-        if (isLoaded && isSignedIn && user) {
-            console.log("User is signed in:", user);
-            const role = user.publicMetadata.role;
-            if (role) {
-                router.replace(`/${role}`);
-            }
+        if (!isLoaded || !isSignedIn) return;
+        const role = user?.publicMetadata.role;
+        console.log('User:', user)
+        console.log('Role:', user?.publicMetadata)
+        if (role) {
+            console.log('user role:', role)
+            const path = `/${role}`;
+            console.log("Redirecting to:", path); // Debugging line
+            router.push(path);
         }
-    }, [isLoaded, isSignedIn, user, router]);
-
-    // Show a loading state while Clerk is initializing
-    if (!isLoaded) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-neutral-900 text-white">
-                Loading…
-            </div>
-        );
-    }
-
-    // If already signed in but no role yet, you could show a placeholder or redirect elsewhere
-    if (isSignedIn && user && !user.publicMetadata.role) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-neutral-900 text-white">
-                Welcome back, {user.firstName}! Setting things up…
-            </div>
-        );
-    }
+    }, [isSignedIn, user, router]);
 
     return (
-        <article className="flex flex-col min-h-screen bg-neutral-900 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
+        <article className="w-full min-h-screen flex flex-col bg-neutral-900 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
             <section className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
                 <SignIn.Root>
                     <SignIn.Step
@@ -102,7 +84,7 @@ const Login: React.FC = () => {
             </section>
             <Footer />
         </article>
-    );
-};
+    )
+}
 
 export default Login;
