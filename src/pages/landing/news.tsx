@@ -69,8 +69,8 @@ const News: React.FC = () => {
                         <Image
                             src={news.image}
                             alt={news.title}
-                            layout="fill"
-                            objectFit="cover"
+                            width={500}
+                            height={300}
                         />
                     </div>
                     <div className="p-6 flex flex-col flex-grow">

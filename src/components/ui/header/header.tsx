@@ -5,6 +5,7 @@ import { Button } from 'primereact/button';
 import { MenuItem } from 'primereact/menuitem';
 import Link from 'next/link';
 import Image from 'next/image';
+import { UserButton } from '@clerk/nextjs';
 
 import logo from '@/assets/logo.png';
 type BaseItem = Omit<MenuItem, 'items'>;
@@ -177,6 +178,7 @@ const Header: React.FC = () => {
 
                     <nav className="hidden sm:flex space-x-6">
                         <MegaMenu model={items} orientation="horizontal" breakpoint="960px" className="bg-transparent border-none text-white" />
+                        <UserButton />
                     </nav>
                 </div>
             </div>

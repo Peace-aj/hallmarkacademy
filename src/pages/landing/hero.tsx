@@ -32,7 +32,7 @@ const Hero = () => {
                         </Link>
                     </div>
                 </div>
-                <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[600px] overflow-hidden rounded-lg lg:col-span-2 border-b border-white">
+                <div className="hidden lg:flex relative w-full h-64 sm:h-80 md:h-96 lg:h-[600px] overflow-hidden rounded-lg lg:col-span-2 border-b border-white">
                     <Image
                         src={heroImage}
                         alt="Hallmark Academy students"
