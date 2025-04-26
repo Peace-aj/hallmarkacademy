@@ -1,4 +1,9 @@
 
+import Image from "next/image";
+import Link from "next/link";
+
+import Menu from "@/components/Navigation/Menu";
+import Navbar from "@/components/Navigation/Navbar";
 
 const DashboardLayout = ({
     children,
@@ -6,13 +11,23 @@ const DashboardLayout = ({
     children: React.ReactNode;
 }>) => {
     return (
-        <article className="h-screen flex">
-            <div className="flex flex-col w-full h-full overflow-hidden bg-gray-100 dark:bg-gray-900">
-                <header className="flex items-center justify-between p-4 bg-white shadow-md dark:bg-gray-800">
-                    <h1 className="text-xl font-bold">Dashboard</h1>
-                </header>
-                <main className="flex-grow p-4 overflow-auto">{children}</main>
-            </div>
+        <article className="h-screen flex bg-gray-100 text-gray-900">
+            {/* LEFT */}
+            <aside className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] bg-gradient-to-br from-gray-800 to-gray-900 text-white flex flex-col gap-4">
+                <Link
+                    href={"/"}
+                    className="flex flex-col items-center justify-center lg:justify-start gap-2 ">
+                    <Image src={"/assets/logo.png"} alt="logo" width={62} height={62} />
+                    <span className="hidden lg:block font-bold uppercase text-sm text-center">Hallmark Academy.</span>
+                </Link>
+                <hr className="border-gray-300 w-full" />
+                <Menu />
+            </aside>
+            {/* RIGHT */}
+            <section className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] overflow-scroll flex flex-col">
+                <Navbar />
+                {children}
+            </section>
         </article>
     );
 }

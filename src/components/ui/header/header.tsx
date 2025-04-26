@@ -37,7 +37,6 @@ const Header: React.FC = () => {
                 <Link
                     href={custom.url || '#'}
                     className="flex items-center justify-center px-3 py-2 font-semibold p-ripple hover:surface-ground rounded-2xl"
-                /* onClick={(e) => options.onClick(e)} */
                 >
                     {custom.icon && <span className={custom.icon} />}
                     <span className="ml-2 text-center">{custom.label}</span>
@@ -50,7 +49,6 @@ const Header: React.FC = () => {
                 <Link
                     href={custom.url || '#'}
                     className="flex flex-col gap-3"
-                /* onClick={(e) => options.onClick(e)} */
                 >
                     <Image src={custom.image} alt={`${custom.label}`} className="w-full" />
                     {custom.subtext && <span>{custom.subtext}</span>}

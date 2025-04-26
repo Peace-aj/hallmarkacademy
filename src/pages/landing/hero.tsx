@@ -24,7 +24,7 @@ const Hero = () => {
                         increasingly online, focusing on interactive, student-centered methods.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 mt-4">
-                        <Link href="/login" passHref>
+                        <Link href="/sign-in" passHref>
                             <Button label="Get Started" raised className="px-6 py-3" />
                         </Link>
                         <Link href="/how-it-work" passHref>

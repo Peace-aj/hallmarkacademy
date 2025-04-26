@@ -3,7 +3,6 @@
 import React from 'react';
 import Image, { StaticImageData } from 'next/image';
 
-// Import your school images
 import nurseryImage from '@/assets/class.jpg';
 import primaryImage from '@/assets/student.jpg';
 import secondaryImage from '@/assets/students2.jpg';
