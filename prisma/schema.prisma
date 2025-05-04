@@ -91,6 +91,7 @@ model Teacher {
   school      School       @relation(fields: [schoolid], references: [id])
   subjects    Subject[]
   classes     Class[]
+  lessons     Lesson[]
   assignments Assignment[]
   tests       Test[]
   createdAt   DateTime     @default(now())
@@ -127,6 +128,7 @@ model Subject {
   school      School         @relation(fields: [schoolid], references: [id])
   teachers    Teacher[]
   assignments Assignment[]
+  lessons     Lesson[]
   grades      SubjectGrade[]
   tests       Test[]
   createdAt   DateTime       @default(now())
@@ -143,6 +145,7 @@ model Class {
   formmaster    Teacher?       @relation(fields: [formmasterid], references: [id])
   students      Student[]
   gradings      ClassGrade[]
+  lessons       Lesson[]
   events        Event[]
   announcements Announcement[]
   createdAt     DateTime       @default(now())
@@ -173,6 +176,22 @@ model Term {
   status    TermStatus
   createdAt DateTime   @default(now())
   updateAt  DateTime   @default(now())
+}
+
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  name      String
+  day       Day
+  startTime DateTime
+  endTime   DateTime
+
+  subjectid   String
+  subject     Subject      @relation(fields: [subjectid], references: [id])
+  classid     String
+  class       Class        @relation(fields: [classid], references: [id])
+  teacherid   String
+  teacher     Teacher      @relation(fields: [teacherid], references: [id])
+  attendances Attendance[]
 }
 
 model Payment {
@@ -337,6 +356,8 @@ model Attendance {
   present   Boolean
   studentId String
   student   Student  @relation(fields: [studentId], references: [id])
+  lessonId  Int
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
 }
 
 model Event {

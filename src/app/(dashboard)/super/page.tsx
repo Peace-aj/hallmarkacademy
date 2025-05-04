@@ -9,11 +9,11 @@ import FinanceChart from "@/components/Charts/FinanceChart";
 import EventCalendarContainer from "@/components/Calendar/EventCalendarContainer";
 import Announcements from "@/components/Events/Announcements";
 
-interface AdminProps {
+interface SuperProps {
     searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
-const Admin = async ({ searchParams }: AdminProps) => {
+const Super = async ({ searchParams }: SuperProps) => {
     return (
         <section className="p-4 flex gap-4 flex-col md:flex-row">
             {/* LEFT */}
@@ -79,4 +79,4 @@ const Admin = async ({ searchParams }: AdminProps) => {
     );
 };
 
-export default Admin;
+export default Super;

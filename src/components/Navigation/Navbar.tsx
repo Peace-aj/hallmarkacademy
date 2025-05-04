@@ -16,7 +16,7 @@ const Navbar = async () => {
                 <input
                     type="text"
                     placeholder="Search..."
-                    className="bg-transparent outline-none w-full placeholder-gray-400"
+                    className="bg-transparent outline-none w-full placeholder-gray-400 py-1"
                 />
             </div>
 
