@@ -18,19 +18,29 @@ model Administration {
 }
 
 model School {
-  id            String         @id @default(cuid())
-  name          String         @unique
-  email         String         @unique
-  phone         String?        @unique
-  address       String
-  logo          String?
-  students      Student[]
-  teachers      Teacher[]
-  subjects      Subject[]
-  paymentsetups PaymentSetup[]
-  payments      Payment[]
-  createdAt     DateTime       @default(now())
-  updateAt      DateTime       @default(now())
+  id                 String         @id @default(cuid())
+  name               String         @unique
+  subtitle           String?
+  schooltype         String
+  email              String         @unique
+  phone              String?        @unique
+  address            String
+  contactperson      String?
+  contactpersonphone String?
+  contactpersonemail String?
+  youtube            String?
+  facebook           String?
+  regnumbercount     Int?
+  regnumberappend    String?
+  regnumberprepend   String?
+  logo               String?
+  students           Student[]
+  teachers           Teacher[]
+  subjects           Subject[]
+  paymentsetups      PaymentSetup[]
+  payments           Payment[]
+  createdAt          DateTime       @default(now())
+  updateAt           DateTime       @default(now())
 }
 
 model Student {
@@ -122,7 +132,7 @@ model Parent {
 
 model Subject {
   id          String         @id @default(cuid())
-  name        String         @unique
+  name        String
   category    String
   schoolid    String
   school      School         @relation(fields: [schoolid], references: [id])

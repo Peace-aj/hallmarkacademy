@@ -74,8 +74,8 @@ const News: React.FC = () => {
                         />
                     </div>
                     <div className="p-6 flex flex-col flex-grow">
-                        <h3 className="text-xl font-semibold text-blue-800 mb-2">{news.title}</h3>
-                        <p className="text-sm text-gray-500 mb-4">{news.date}</p>
+                        <h3 className="text-xl font-semibold text-blue-800 mt-6">{news.title}</h3>
+                        <p className="text-sm text-gray-500">{news.date}</p>
                         <p className="text-gray-700 flex-grow">{news.description}</p>
                     </div>
                 </div>
