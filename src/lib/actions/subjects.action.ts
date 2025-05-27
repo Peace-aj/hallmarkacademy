@@ -52,14 +52,17 @@ export async function create(
       ? { connect: parsed.data.teachers.map((id) => ({ id })) }
       : undefined;
 
+    const createData: any = {
+      name: parsed.data.name,
+      category: parsed.data.category,
+      teachers: teacherConnect,
+    };
+    if (schoolid) {
+      createData.schoolid = schoolid;
+    }
+
     const data = await prisma.subject.create({
-      data: {
-        name: parsed.data.name,
-        category: parsed.data.category,
-        // Link via foreign key scalar instead of nested relation
-        schoolid: schoolid ?? undefined,
-        teachers: teacherConnect,
-      },
+      data: createData,
     });
 
     revalidatePath("/subjects");
