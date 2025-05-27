@@ -138,7 +138,7 @@ export const createSubject = async (
                 category: data.category,
                 school: { connect: { id: data.schoolid } },
                 teachers: {
-                    connect: data.teachers.map((teacherid) => ({ id: teacherid })),
+                    connect: (data.teachers ?? []).map((teacherid) => ({ id: teacherid })),
                 },
             },
         });
@@ -164,7 +164,7 @@ export const updateSubject = async (
                 school: { connect: { id: data.schoolid } },
                 // replace all teachers
                 teachers: {
-                    set: data.teachers.map((teacherid) => ({ id: teacherid })),
+                    set: (data.teachers ?? []).map((teacherid) => ({ id: teacherid })),
                 },
             },
         });
