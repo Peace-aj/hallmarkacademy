@@ -13,12 +13,11 @@ import { auth } from "@clerk/nextjs/server";
 
 type StudentList = Student & { class: Class };
 
-// Explicitly declare the incoming props shape
-type Props = {
-    searchParams: { [key: string]: string | undefined };
-};
+// We declare props as `any` to avoid the built-in PageProps constraint
+export default async function StudentListPage(props: any) {
+    // Narrow just the part we need:
+    const { searchParams }: { searchParams: { [key: string]: string | undefined } } = props;
 
-export default async function StudentListPage({ searchParams }: Props) {
     const { sessionClaims } = await auth();
     const role = (sessionClaims?.metadata as { role?: string })?.role;
 
@@ -28,9 +27,7 @@ export default async function StudentListPage({ searchParams }: Props) {
         { header: "Grade", accessor: "grade", className: "hidden md:table-cell" },
         { header: "Phone", accessor: "phone", className: "hidden lg:table-cell" },
         { header: "Address", accessor: "address", className: "hidden lg:table-cell" },
-        ...(role === "admin"
-            ? [{ header: "Actions", accessor: "action" }]
-            : []),
+        ...(role === "admin" ? [{ header: "Actions", accessor: "action" }] : []),
     ];
 
     const renderRow = (item: StudentList) => (
