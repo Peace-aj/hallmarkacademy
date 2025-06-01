@@ -87,13 +87,13 @@ const Header: React.FC = () => {
                                     alt="Hallmark Academy"
                                     className="object-contain"
                                     fill
-                                    sizes="40px"
+                                    sizes="60px"
                                     priority
                                 />
                             </div>
                             <span className={cn(
-                                'text-xl font-bold hidden sm:block',
-                                isScrolled ? 'text-gray-900 dark:text-white' : 'text-white'
+                                'text-xl sm:text-2xl font-bold hidden sm:block',
+                                isScrolled ? 'text-gray-900 dark:text-white' : 'dark:text-white text-gray-900'
                             )}>
                                 Hallmark Academy
                             </span>
@@ -115,7 +115,7 @@ const Header: React.FC = () => {
                                         'flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                                         isScrolled
                                             ? 'text-gray-900 hover:text-gray-600 dark:text-gray-100 dark:hover:text-gray-300'
-                                            : 'text-white hover:text-gray-200'
+                                            : 'dark:text-white text-gray-900 hover:text-gray-200'
                                     )}
                                 >
                                     <span>{item.label}</span>
