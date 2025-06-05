@@ -26,7 +26,7 @@ const Loader: React.FC<LoaderProps> = ({ visible, onHide }) => {
                 maxWidth: "100%",
                 maxHeight: "100%",
                 padding: 0,
-                background: "rgba(0, 0, 0, 0.9)",
+                background: "rgba(255, 255, 255, 0.4)",
             }}
             contentStyle={{
                 display: "flex",
