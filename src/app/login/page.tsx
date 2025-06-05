@@ -17,64 +17,79 @@ const Login = () => {
     useEffect(() => {
         if (!isLoaded || !isSignedIn) return;
         const role = user?.publicMetadata.role;
-        console.log('User:', user)
-        console.log('Role:', user?.publicMetadata)
         if (role) {
-            console.log('user role:', role)
-            const path = `/${role}`;
-            console.log("Redirecting to:", path); // Debugging line
-            router.push(path);
+            router.push(`/${role}`);
         }
-    }, [isSignedIn, user, router]);
+    }, [isLoaded, isSignedIn, user, router]);
 
     return (
-        <article className="w-full min-h-screen flex flex-col bg-neutral-900 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
-            <section className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
+        <article className="flex flex-col min-h-screen bg-neutral-900 text-neutral-200">
+            <section className="flex flex-1 items-center justify-center bg-gray-100 text-gray-900 px-4">
                 <SignIn.Root>
+                    {/* Container scales from full width on mobile to narrower on large screens */}
                     <SignIn.Step
                         name="start"
-                        className="bg-white rounded-md shadow-2xl flex gap-3 w-[70%] sm:w-[70%] lg:w-[45%] max-w-6xl mx-auto">
-                        <div className="hidden sm:flex flex-col bg-gradient-to-br from-cyan-600 to-blue-800 text-white py-4 ">
-                            <Link href="/" className="flex items-center justify-center">
-                                <h1 className="text-xl font-bold flex flex-col items-center justify-center gap-2">
-                                    <Image src="/assets/logo.png" alt="logo" className="" width={80} height={80} />
-                                    Welcome Back
-                                </h1>
+                        className="flex flex-col sm:flex-row w-full max-w-xl bg-white rounded-lg shadow-2xl overflow-hidden transition-shadow duration-300"
+                    >
+                        {/* Left Panel (hidden on small screens) */}
+                        <div className="hidden sm:flex flex-col w-1/2 bg-gradient-to-br from-cyan-600 to-blue-800 text-white p-6">
+                            <Link href="/" className="flex items-center justify-center mb-4">
+                                <Image
+                                    src="/assets/logo.png"
+                                    alt="Hallmark Academy"
+                                    width={60}
+                                    height={60}
+                                    className="rounded-full"
+                                />
                             </Link>
-                            <p className="text-sm text-white/90 text-center pb-2">To Hallmark Academy Lafia.</p>
-                            <hr className="border-gray-300 w-full" />
-                            <p className="text-sm text-white text-justify py-2 px-3">
-                                Dive into your world of learning—check today’s assignments, track your progress, and connect with teachers and classmates.
-                                Please enter your credentials below to continue your journey.
+                            <h1 className="text-2xl font-bold text-center">Welcome Back</h1>
+                            <p className="text-xs text-white/90 text-center mt-1 mb-2">
+                                To Hallmark Academy Lafia
+                            </p>
+                            <hr className="border-gray-300 my-2" />
+                            <p className="text-xs leading-relaxed text-justify mt-2">
+                                Dive into your world of learning—check today’s assignments, track
+                                your progress, and connect with teachers and classmates. Please
+                                enter your credentials below to continue your journey.
                             </p>
                         </div>
-                        <div className="flex flex-col gap-3 py-12 px-8">
 
-                            <h2 className="text-gray-500 text-center font-bold text-xl">Sign in to your account</h2>
-                            <Clerk.GlobalError className="text-sm text-red-400" />
-                            <Clerk.Field name="identifier" className="flex flex-col gap-2">
-                                <Clerk.Label className="text-base text-gray-400 font-semibold">Email</Clerk.Label>
+                        {/* Right Panel (form) */}
+                        <div className="flex flex-col w-full sm:w-1/2 p-6 sm:p-8">
+                            <h2 className="text-center text-lg sm:text-xl font-semibold text-gray-700 mb-4">
+                                Sign in to your account
+                            </h2>
+                            <Clerk.GlobalError className="text-sm text-red-500 text-center mb-2" />
+
+                            <Clerk.Field name="identifier" className="flex flex-col mb-4">
+                                <Clerk.Label className="text-sm text-gray-500 font-medium mb-1">
+                                    Email
+                                </Clerk.Label>
                                 <Clerk.Input
                                     type="email"
                                     required
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500 transition"
-                                    placeholder="you@example.com" />
-                                <Clerk.FieldError className="text-sm text-red-400 mt-1" />
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500 transition"
+                                    placeholder="you@example.com"
+                                />
+                                <Clerk.FieldError className="text-xs text-red-500 mt-1" />
                             </Clerk.Field>
 
-                            <Clerk.Field name="password" className="flex flex-col gap-2">
-                                <Clerk.Label className="text-base text-gray-400 font-semibold">Password</Clerk.Label>
+                            <Clerk.Field name="password" className="flex flex-col mb-6">
+                                <Clerk.Label className="text-sm text-gray-500 font-medium mb-1">
+                                    Password
+                                </Clerk.Label>
                                 <Clerk.Input
                                     type="password"
                                     required
-                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500 transition"
-                                    placeholder="********" />
-                                <Clerk.FieldError className="text-sm text-red-400 mt-1" />
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500 transition"
+                                    placeholder="********"
+                                />
+                                <Clerk.FieldError className="text-xs text-red-500 mt-1" />
                             </Clerk.Field>
 
                             <SignIn.Action
                                 submit
-                                className="w-full py-2 mt-4 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-cyan-700 transition"
+                                className="w-full py-2 bg-cyan-600 text-white font-semibold rounded-md hover:bg-cyan-700 transition"
                             >
                                 Sign In
                             </SignIn.Action>
@@ -84,7 +99,7 @@ const Login = () => {
             </section>
             <Footer />
         </article>
-    )
-}
+    );
+};
 
 export default Login;
