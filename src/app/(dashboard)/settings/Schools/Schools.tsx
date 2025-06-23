@@ -157,6 +157,7 @@ const Schools: FC<SchoolsClientProps> = ({ initialSchools, role }) => {
                 <DataTable
                     value={schools}
                     paginator rows={5}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
                     stripedRows
                     globalFilter={filter}
                     filterDisplay="menu"
