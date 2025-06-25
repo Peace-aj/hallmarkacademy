@@ -3,7 +3,6 @@
 import Header from "@/components/ui/header/header";
 import Landing from "@/pages/landing/landing";
 import Footer from "@/components/ui/footer/footer";
-import Navigation from "@/components/ui/navigation/navigation";
 
 
 // Type definitions for menu
@@ -30,25 +29,17 @@ const links: MenuItem[] = [
       {
         Head: 'Centeral Admin',
         sublink: [
-          { name: 'The Proprietor', link: '/proprietor' },
-          { name: 'The Principal', link: '/principal' },
-          { name: 'The Headmaster', link: '/headmaster' },
-          { name: 'The Nursery Head', link: '/nursery-head' },
-        ]
-      },
-      {
-        Head: 'Sections & Units',
-        sublink: [
-          { name: 'The Secondary Section', link: '/secondary-section' },
-          { name: 'The Primary Section', link: '/primary-section' },
-          { name: 'The Nusery Section', link: '/nursary-section' },
+          { name: 'Exams & Records', link: '/exams-records' },
+          { name: 'The Admission Unit', link: '/admission-units' },
+          { name: 'Boarding Students', link: '/boarding-students' },
+          { name: 'Day Students', link: '/day-students' },
         ]
       },
       {
         Head: 'Centers',
         sublink: [
-          { name: 'Skill Aquisition', link: '/skill-aquisition' },
-          { name: 'ICT', link: '/ICT' },
+          { name: 'Skill Acquisition', link: '/skill-acquisition' },
+          { name: 'ICT Center', link: '/ict-center' },
         ]
       },
     ]
@@ -58,10 +49,10 @@ const links: MenuItem[] = [
       {
         Head: 'Sections',
         sublink: [
-          { name: 'Nursery', link: '/admission-nursery' },
-          { name: 'Primary', link: '/admission-primary' },
-          { name: 'Junior Section', link: '/admission-jss' },
-          { name: 'Senior Section', link: '/admission-ss' },
+          { name: 'Nursery Section', link: '/admission-nursery' },
+          { name: 'Primary Section', link: '/admission-primary' },
+          { name: 'Junior Section', link: '/admission-junior' },
+          { name: 'Senior Section', link: '/admission-senior' },
         ]
       },
       {
@@ -77,23 +68,23 @@ const links: MenuItem[] = [
   {
     name: 'About Us', submenu: true, sublinks: [
       {
-        Head: 'All About Hallmark',
+        Head: 'Hallmark Academy',
         sublink: [
-          { name: 'The Secondary', link: '/about-secondary' },
-          { name: 'The Primary', link: '/about-primary' },
-          { name: 'The Nursery', link: '/about-nursery' },
-          { name: 'Mission & Vission', link: '/about-mission-vission' },
-          { name: 'Projects', link: '/about-projects' },
+          { name: 'Proprietor', link: '/about-proprietor' },
+          { name: 'Principal', link: '/about-principal' },
+          { name: 'Head Master', link: '/about-head-master' },
+          { name: 'Nursery Head', link: '/about-nursery-head' },
+          { name: 'Mission', link: '/about-mission' },
+          { name: 'Vision', link: '/about-vision' },
         ]
       },
       {
-        Head: 'The Management',
+        Head: 'Units & Sections',
         sublink: [
-          { name: 'Pricipal Officer', link: '/about-principal-officer' },
-          { name: 'Head Master', link: '/about-head-master-officer' },
-          { name: 'Nursery Head', link: '/about-nursery-head-officer' },
-          { name: 'Board of Trustees', link: '/about-board-of-trustees' },
-          { name: 'Governing Council', link: '/about-governing-council' },
+          { name: 'Nursery Section', link: '/about-nursery-section' },
+          { name: 'Primary Section', link: '/about-primary-section' },
+          { name: 'Junior Section', link: '/about-junior-section' },
+          { name: 'Senior Section', link: '/about-senior-section' },
         ]
       },
     ]
@@ -117,23 +108,6 @@ const links: MenuItem[] = [
           { name: 'OER', link: '/oer' },
         ]
       },
-      {
-        Head: 'Research Centre',
-        sublink: [
-          { name: 'Zankli Research Center', link: '/zankli-research-center' },
-        ]
-      },
-    ]
-  },
-  {
-    name: 'Portals', submenu: true, sublinks: [
-      {
-        Head: 'Authentication',
-        sublink: [
-          { name: 'Signin', link: '/signin' },
-          { name: 'Signup', link: '/signup' },
-        ]
-      },
     ]
   },
   {
@@ -154,8 +128,7 @@ const links: MenuItem[] = [
 const App = () => {
   return (
     <article className="w-full min-h-screen flex flex-col bg-neutral-900 text-neutral-200 font-[family-name:var(--font-geist-sans)]">
-      {/* <Header /> */}
-      <Navigation links={links} />
+      <Header links={links} />
       <Landing />
       <Footer />
     </article>
