@@ -13,7 +13,6 @@ export const subjectSchema = z.object({
 });
 export type SubjectSchema = z.infer<typeof subjectSchema>;
 
-
 /**
  * CLASS
  */
@@ -66,15 +65,9 @@ export const schoolSchema = z.object({
     regnumbercount: z.number().int().optional(),
     regnumberappend: z.string().optional(),
     regnumberprepend: z.string().optional(),
-    logo: z.string().optional(),/* 
-    students: z.array(z.string().cuid()),
-    teachers: z.array(z.string().cuid()),
-    subjects: z.array(z.string().cuid()),
-    paymentsetups: z.array(z.string().cuid()),
-    payments: z.array(z.string().cuid()), */
+    logo: z.string().optional(),
 });
 export type SchoolSchema = z.infer<typeof schoolSchema>;
-
 
 /**
  * TEACHER
@@ -104,7 +97,6 @@ export const teacherSchema = z.object({
     classes: z.array(z.string()).optional(),
 });
 export type TeacherSchema = z.infer<typeof teacherSchema>;
-
 
 /**
  * STUDENT
@@ -138,7 +130,6 @@ export const studentSchema = z.object({
     classid: z.string().min(1, { message: "Student's class is required!" }),
 });
 export type StudentSchema = z.infer<typeof studentSchema>;
-
 
 /**
  * TEST

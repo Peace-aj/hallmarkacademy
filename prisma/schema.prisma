@@ -12,6 +12,7 @@ model Administration {
   id        String   @id @default(cuid())
   username  String   @unique
   email     String   @unique
+  password  String?
   role      Roles
   createdAt DateTime @default(now())
   updateAt  DateTime @default(now())
@@ -63,6 +64,7 @@ model Student {
   state           String
   lga             String
   avarta          String?
+  password        String?
   parentid        String
   parent          Parent               @relation(fields: [parentid], references: [id])
   schoolid        String
@@ -97,6 +99,7 @@ model Teacher {
   phone       String?      @unique
   address     String
   avarta      String?
+  password    String?
   schoolid    String
   school      School       @relation(fields: [schoolid], references: [id])
   subjects    Subject[]
@@ -125,6 +128,7 @@ model Parent {
   email      String    @unique
   phone      String    @unique
   address    String
+  password   String?
   students   Student[]
   createdAt  DateTime  @default(now())
   updateAt   DateTime  @default(now())
