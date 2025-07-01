@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { PrimeReactProvider } from 'primereact/api'
-import { SessionProvider } from "next-auth/react";
+import SessionProvider from "@/components/providers/SessionProvider";
 
 import "./globals.css";
 import 'primereact/resources/themes/lara-light-cyan/theme.css';
