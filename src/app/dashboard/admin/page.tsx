@@ -1,7 +1,10 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { FiUsers } from "react-icons/fi";
 import { FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
 import { MdFamilyRestroom } from "react-icons/md";
 
+import { authOptions } from "@/lib/auth";
 import UserCard from "@/components/Card/UserCard";
 import CountChartContainer from "@/components/Charts/CountChartContainer";
 import AttendanceChartContainer from "@/components/Charts/AttendanceChartContainer";
@@ -9,11 +12,17 @@ import FinanceChart from "@/components/Charts/FinanceChart";
 import EventCalendarContainer from "@/components/Calendar/EventCalendarContainer";
 import Announcements from "@/components/Events/Announcements";
 
-interface SuperProps {
+interface AdminProps {
     searchParams: Promise<{ [key: string]: string | undefined }>;
 }
 
-const Super = async ({ searchParams }: SuperProps) => {
+const Admin = async ({ searchParams }: AdminProps) => {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user.role !== "admin") {
+        redirect("/auth/signin");
+    }
+
     return (
         <section className="p-4 flex gap-4 flex-col md:flex-row">
             {/* LEFT */}
@@ -79,4 +88,4 @@ const Super = async ({ searchParams }: SuperProps) => {
     );
 };
 
-export default Super;
+export default Admin;

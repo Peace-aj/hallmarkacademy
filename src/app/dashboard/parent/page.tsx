@@ -1,17 +1,22 @@
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
+import { authOptions } from "@/lib/auth";
 import Announcements from "@/components/Events/Announcements";
 import BigCalendarContainer from "@/components/Calendar/BigCalendarContainer";
 import SchoolFee from "@/components/Charts/SchoolFee";
 import prisma from "@/lib/prisma";
 
 const Parent = async () => {
-    const { userId } = await auth();
-    const currentUserId = userId;
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user.role !== "parent") {
+        redirect("/auth/signin");
+    }
 
     const students = await prisma.student.findMany({
         where: {
-            parentid: currentUserId!,
+            parentid: session.user.id,
         },
     });
 

@@ -1,4 +1,3 @@
-
 import prisma from '@/lib/prisma';
 import { IconType } from 'react-icons';
 
@@ -33,7 +32,16 @@ const UserCard: React.FC<Props> = async ({
     delta,
     deltaLabel,
 }) => {
-    const count = await modelMap[type].count();
+    let count = 0;
+    
+    if (type === 'super' || type === 'management' || type === 'admin') {
+        count = await modelMap[type].count({
+            where: { role: type.toUpperCase() }
+        });
+    } else {
+        count = await modelMap[type].count();
+    }
+    
     const title = type.charAt(0).toUpperCase() + type.slice(1) + (type === 'parent' ? 's' : 's');
 
     return (

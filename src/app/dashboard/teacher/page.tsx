@@ -1,7 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { FaUserGraduate } from "react-icons/fa";
 import { MdLibraryBooks, MdSubject } from "react-icons/md";
 
+import { authOptions } from "@/lib/auth";
 import Announcements from "@/components/Events/Announcements";
 import BigCalendarContainer from "@/components/Calendar/BigCalendarContainer";
 import EventCalendarContainer from "@/components/Calendar/EventCalendarContainer";
@@ -12,7 +14,11 @@ interface TeacherProps {
 }
 
 const Teacher = async ({ searchParams }: TeacherProps) => {
-    const { userId } = await auth();
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user.role !== "teacher") {
+        redirect("/auth/signin");
+    }
 
     return (
         <section className="flex-1 p-4 flex flex-col xl:flex-row gap-4">
@@ -49,7 +55,7 @@ const Teacher = async ({ searchParams }: TeacherProps) => {
                 {/* SCHEDULE */}
                 <div className="h-full bg-white p-4 rounded-md">
                     <h1 className="text-xl font-semibold">Schedule</h1>
-                    <BigCalendarContainer type="teacherid" id={userId!} />
+                    <BigCalendarContainer type="teacherid" id={session.user.id} />
                 </div>
             </div>
 

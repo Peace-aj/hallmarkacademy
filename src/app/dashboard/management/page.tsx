@@ -1,7 +1,10 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { FiUsers } from "react-icons/fi";
 import { FaChalkboardTeacher, FaUserGraduate } from "react-icons/fa";
 import { MdFamilyRestroom } from "react-icons/md";
 
+import { authOptions } from "@/lib/auth";
 import UserCard from "@/components/Card/UserCard";
 import CountChartContainer from "@/components/Charts/CountChartContainer";
 import AttendanceChartContainer from "@/components/Charts/AttendanceChartContainer";
@@ -14,6 +17,12 @@ interface ManagementProps {
 }
 
 const Management = async ({ searchParams }: ManagementProps) => {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user.role !== "management") {
+        redirect("/auth/signin");
+    }
+
     return (
         <section className="p-4 flex gap-4 flex-col md:flex-row">
             {/* LEFT */}
