@@ -13,7 +13,7 @@ import EventCalendarContainer from "@/components/Calendar/EventCalendarContainer
 import Announcements from "@/components/Events/Announcements";
 
 interface SuperProps {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
+    searchParams: { [key: string]: string | undefined };
 }
 
 const Super = async ({ searchParams }: SuperProps) => {

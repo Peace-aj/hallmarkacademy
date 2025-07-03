@@ -10,7 +10,7 @@ import EventCalendarContainer from "@/components/Calendar/EventCalendarContainer
 import UserCard from "@/components/Card/UserCard";
 
 interface TeacherProps {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
+    searchParams: { [key: string]: string | undefined };
 }
 
 const Teacher = async ({ searchParams }: TeacherProps) => {

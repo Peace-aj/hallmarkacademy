@@ -6,7 +6,7 @@ import { schoolSchema } from "@/lib/schemas";
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -14,11 +14,12 @@ export async function PUT(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const { id } = await params;
         const body = await request.json();
         const validatedData = schoolSchema.parse(body);
 
         const school = await prisma.school.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 name: validatedData.name,
                 subtitle: validatedData.subtitle || null,
@@ -47,7 +48,7 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -55,8 +56,10 @@ export async function DELETE(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const { id } = await params;
+
         await prisma.school.delete({
-            where: { id: params.id }
+            where: { id }
         });
 
         return NextResponse.json({ message: "School deleted successfully" });

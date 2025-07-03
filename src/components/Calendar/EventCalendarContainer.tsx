@@ -3,13 +3,13 @@ import EventCalendar from "./EventCalendar";
 import EventList from "../Events/EventList";
 
 interface EventCalendarContainerProps {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
+    searchParams: { [key: string]: string | undefined };
 }
 
 const EventCalendarContainer = async ({
     searchParams,
 }: EventCalendarContainerProps) => {
-    const { date } = await searchParams;
+    const { date } = searchParams;
 
     return (
         <div className="bg-white p-4 rounded-md">
