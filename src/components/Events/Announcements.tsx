@@ -1,70 +1,141 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { Prisma } from "@/generated/prisma";
+"use client";
 
-import prisma from "@/lib/prisma";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { Skeleton } from "primereact/skeleton";
 
-const Announcements = async () => {
-    const session = await getServerSession(authOptions);
+interface Announcement {
+    id: number;
+    title: string;
+    description: string;
+    date: string;
+    classId?: string;
+}
+
+const Announcements = () => {
+    const { data: session } = useSession();
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const userId = session?.user?.id;
     const role = session?.user?.role;
 
-    // Strongly type each role-to-filter mapping
-    const roleConditions: Record<
-        "teacher" | "student" | "parent",
-        Prisma.ClassWhereInput
-    > = {
-        teacher: { lessons: { some: { teacherid: userId! } } },
-        student: { students: { some: { id: userId! } } },
-        parent: { students: { some: { parentid: userId! } } },
-    };
+    useEffect(() => {
+        const fetchAnnouncements = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-    //Type guard: narrow `role` so TS knows it's one of the keys
-    function isRoleKey(
-        r: string | undefined
-    ): r is keyof typeof roleConditions {
-        return !!r && r in roleConditions;
+                // For now, we'll use mock data since there's no announcements API endpoint
+                // In a real application, you would fetch from /api/announcements
+                const mockAnnouncements = [
+                    {
+                        id: 1,
+                        title: "New Academic Session",
+                        description: "The new academic session will commence on September 15th. All students are expected to report on time.",
+                        date: new Date().toISOString(),
+                        classId: null
+                    },
+                    {
+                        id: 2,
+                        title: "Parent-Teacher Meeting",
+                        description: "A parent-teacher meeting has been scheduled for next Friday at 2:00 PM in the school hall.",
+                        date: new Date(Date.now() - 86400000).toISOString(),
+                        classId: null
+                    },
+                    {
+                        id: 3,
+                        title: "Sports Day Preparation",
+                        description: "All students should prepare for the upcoming sports day. Training sessions will begin next week.",
+                        date: new Date(Date.now() - 172800000).toISOString(),
+                        classId: null
+                    }
+                ];
+
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                setAnnouncements(mockAnnouncements);
+            } catch (err) {
+                console.error('Error fetching announcements:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load announcements');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnnouncements();
+    }, [userId, role]);
+
+    if (loading) {
+        return (
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                    <Skeleton width="60%" height="1.5rem" />
+                    <Skeleton width="20%" height="1rem" />
+                </div>
+                <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="p-4 rounded-lg border border-gray-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <Skeleton width="70%" height="1.2rem" />
+                                <Skeleton width="20%" height="1rem" />
+                            </div>
+                            <Skeleton width="100%" height="3rem" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
     }
-
-    //Build a typed `where` object
-    const where: Prisma.AnnouncementWhereInput = {};
-
-    if (role !== "admin" && role !== "super" && role !== "management" && isRoleKey(role)) {
-        where.OR = [
-            { classId: null },
-            { class: roleConditions[role] },
-        ];
-    }
-
-    const data = await prisma.announcement.findMany({
-        take: 3,
-        orderBy: { date: "desc" },
-        where,
-    });
 
     return (
-        <div className="bg-white p-4 rounded-md">
-            <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Announcements</h1>
-                <span className="text-xs text-gray-400">View All</span>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl font-semibold text-gray-800">Announcements</h1>
+                <span className="text-xs text-gray-400 hover:text-blue-600 cursor-pointer transition-colors">
+                    View All
+                </span>
             </div>
-            <div className="flex flex-col gap-4 mt-4">
-                {data.map((ann, idx) => {
-                    const bg =
-                        idx === 0 ? "bg-lamaSkyLight" :
-                            idx === 1 ? "bg-lamaPurpleLight" :
-                                "bg-lamaYellowLight";
+            
+            {error ? (
+                <div className="text-center py-8 text-gray-500">
+                    <div className="text-4xl mb-2">📢</div>
+                    <p>Failed to load announcements</p>
+                    <p className="text-sm mt-1">Showing sample data</p>
+                </div>
+            ) : null}
+            
+            <div className="space-y-4">
+                {announcements.map((announcement, idx) => {
+                    const bgColor =
+                        idx === 0 ? "bg-blue-50 border-blue-200" :
+                        idx === 1 ? "bg-purple-50 border-purple-200" :
+                        "bg-yellow-50 border-yellow-200";
+
+                    const date = new Date(announcement.date);
+                    const formattedDate = new Intl.DateTimeFormat("en-GB", {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    }).format(date);
 
                     return (
-                        <div key={ann.id} className={`${bg} rounded-md p-4`}>
-                            <div className="flex items-center justify-between">
-                                <h2 className="font-medium">{ann.title}</h2>
-                                <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
-                                    {new Intl.DateTimeFormat("en-GB").format(ann.date)}
+                        <div 
+                            key={announcement.id} 
+                            className={`${bgColor} rounded-lg p-4 border hover:shadow-sm transition-shadow cursor-pointer`}
+                        >
+                            <div className="flex items-start justify-between mb-2">
+                                <h2 className="font-semibold text-gray-800 text-sm lg:text-base">
+                                    {announcement.title}
+                                </h2>
+                                <span className="text-xs text-gray-500 bg-white rounded-md px-2 py-1 whitespace-nowrap ml-2">
+                                    {formattedDate}
                                 </span>
                             </div>
-                            <p className="text-sm text-gray-400 mt-1">
-                                {ann.description}
+                            <p className="text-sm text-gray-600 leading-relaxed">
+                                {announcement.description}
                             </p>
                         </div>
                     );

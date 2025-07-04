@@ -1,5 +1,7 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+"use client";
+
+import { useSession } from "next-auth/react";
+import { Skeleton } from "primereact/skeleton";
 import LinkItem from './LinkItem';
 
 const menuItems = [
@@ -27,27 +29,41 @@ const menuItems = [
         items: [
             { icon: '/assets/profile.png', label: 'Profile', href: '/dashboard/profile', visible: ['admin', 'super', 'management', 'teacher', 'student', 'parent'] },
             { icon: '/assets/setting.png', label: 'Settings', href: '/dashboard/settings', visible: ['admin', 'super', 'management', 'teacher', 'student', 'parent'] },
-            { icon: '/assets/logout.png', label: 'Logout', href: '/auth/signout', visible: ['admin', 'super', 'management', 'teacher', 'student', 'parent'] },
         ],
     },
 ];
 
-const Menu = async () => {
-    const session = await getServerSession(authOptions);
+const Menu = () => {
+    const { data: session, status } = useSession();
+    
+    if (status === "loading") {
+        return (
+            <aside className="p-4 h-full space-y-6">
+                {[1, 2].map((section) => (
+                    <div key={section}>
+                        <Skeleton width="60%" height="0.8rem" className="mb-3" />
+                        <div className="space-y-2">
+                            {[1, 2, 3, 4].map((item) => (
+                                <div key={item} className="flex items-center gap-3 p-2">
+                                    <Skeleton shape="circle" size="1.5rem" />
+                                    <Skeleton width="70%" height="1rem" className="hidden lg:block" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </aside>
+        );
+    }
+
     const role = session?.user?.role || 'guest';
 
     return (
-        <aside
-            className="
-        p-4 h-[calc(100vh-2rem)] max-h-screen
-        overflow-y-auto
-        scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700
-      "
-        >
+        <aside className="p-4 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700">
             <nav className="space-y-6">
                 {menuItems.map(section => (
                     <div key={section.title}>
-                        <h3 className="text-white/80 uppercase tracking-wider text-xs mb-2">
+                        <h3 className="text-white/80 uppercase tracking-wider text-xs mb-3 px-3 hidden lg:block">
                             {section.title}
                         </h3>
                         <ul className="space-y-1">
