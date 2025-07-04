@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideIcon } from 'lucide-react';
+import { DivideIcon as LucideIcon } from 'lucide-react';
 import { Skeleton } from 'primereact/skeleton';
 
 interface Props {
