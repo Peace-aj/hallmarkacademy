@@ -1,66 +1,80 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { Tooltip } from "primereact/tooltip";
+import { LucideIcon } from "lucide-react";
 import type { FC } from "react";
 
 interface LinkItemProps {
     item: {
         href: string;
-        icon: string;
+        icon: LucideIcon;
         label: string;
     };
 }
 
 const LinkItem: FC<LinkItemProps> = ({ item }) => {
     const pathname = usePathname();
-    const isActive = pathname === item.href;
+    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+    const Icon = item.icon;
+    const tooltipId = `tooltip-${item.label.replace(/\s+/g, '-').toLowerCase()}`;
 
     return (
         <>
-            <Tooltip target={`.tooltip-${item.label.replace(/\s+/g, '-').toLowerCase()}`} position="right" />
+            <Tooltip target={`.${tooltipId}`} position="right" />
             <Link
                 href={item.href}
                 className={`
-                    flex items-center gap-3 px-3 py-3 rounded-lg text-gray-200 
-                    hover:bg-gray-700 hover:text-white transition-all duration-200 
-                    group relative
-                    ${isActive ? 'bg-gray-700 text-white shadow-lg' : ''}
+                    flex items-center gap-3 px-3 py-3 rounded-xl text-gray-200 
+                    hover:bg-gray-700/50 hover:text-white transition-all duration-300 
+                    group relative overflow-hidden
+                    ${isActive ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/25' : ''}
                 `}
-                data-pr-tooltip={item.label}
-                data-pr-position="right"
             >
                 {/* Active indicator */}
                 {isActive && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-400 rounded-r-full" />
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full" />
                 )}
                 
+                {/* Hover effect background */}
                 <div className={`
-                    tooltip-${item.label.replace(/\s+/g, '-').toLowerCase()}
-                    flex items-center justify-center w-6 h-6 flex-shrink-0
+                    absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 
+                    rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                    ${isActive ? 'opacity-100' : ''}
+                `} />
+                
+                <div className={`
+                    ${tooltipId}
+                    flex items-center justify-center w-5 h-5 flex-shrink-0 relative z-10
                     ${isActive ? 'scale-110' : 'group-hover:scale-105'}
-                    transition-transform duration-200
-                `}>
-                    <Image
-                        src={item.icon}
-                        alt={item.label}
-                        width={20}
-                        height={20}
-                        className="object-contain"
+                    transition-transform duration-300
+                `}
+                data-pr-tooltip={item.label}
+                data-pr-position="right"
+                >
+                    <Icon 
+                        size={20} 
+                        className={`
+                            ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
+                            transition-colors duration-300
+                        `}
                     />
                 </div>
                 
-                <span className="hidden lg:block font-medium truncate">
+                <span className={`
+                    hidden lg:block font-medium truncate relative z-10
+                    ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
+                    transition-colors duration-300
+                `}>
                     {item.label}
                 </span>
                 
-                {/* Hover effect */}
+                {/* Shine effect on hover */}
                 <div className={`
-                    absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 
-                    rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                    ${isActive ? 'opacity-100' : ''}
+                    absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent
+                    transform -skew-x-12 -translate-x-full group-hover:translate-x-full
+                    transition-transform duration-700 ease-out
                 `} />
             </Link>
         </>

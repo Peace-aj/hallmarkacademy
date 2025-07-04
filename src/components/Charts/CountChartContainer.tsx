@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Skeleton } from "primereact/skeleton";
-import Image from "next/image";
+import { MoreHorizontal } from "lucide-react";
 import CountChart from "./CountChart";
 
 interface StudentData {
@@ -10,46 +10,57 @@ interface StudentData {
     girls: number;
 }
 
-const CountChartContainer = () => {
+interface CountChartContainerProps {
+    data?: Array<{ gender: string; _count: { _all: number } }>;
+}
+
+const CountChartContainer = ({ data: propData }: CountChartContainerProps) => {
     const [data, setData] = useState<StudentData>({ boys: 0, girls: 0 });
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!propData);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchStudentData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+        if (propData) {
+            // Use provided data
+            const boys = propData.find(item => item.gender === 'MALE')?._count._all || 0;
+            const girls = propData.find(item => item.gender === 'FEMALE')?._count._all || 0;
+            setData({ boys, girls });
+            setLoading(false);
+        } else {
+            // Fetch data if not provided
+            fetchStudentData();
+        }
+    }, [propData]);
 
-                const response = await fetch('/api/students?limit=1000'); // Get all students for counting
-                if (!response.ok) {
-                    throw new Error('Failed to fetch student data');
-                }
+    const fetchStudentData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                const result = await response.json();
-                const students = result.data || [];
-
-                // Count by gender
-                const boys = students.filter((student: any) => student.gender === 'MALE').length;
-                const girls = students.filter((student: any) => student.gender === 'FEMALE').length;
-
-                setData({ boys, girls });
-            } catch (err) {
-                console.error('Error fetching student data:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load data');
-                // Set fallback data
-                setData({ boys: 20, girls: 40 });
-            } finally {
-                setLoading(false);
+            const response = await fetch('/api/students?limit=1000');
+            if (!response.ok) {
+                throw new Error('Failed to fetch student data');
             }
-        };
 
-        fetchStudentData();
-    }, []);
+            const result = await response.json();
+            const students = result.data || [];
+
+            const boys = students.filter((student: any) => student.gender === 'MALE').length;
+            const girls = students.filter((student: any) => student.gender === 'FEMALE').length;
+
+            setData({ boys, girls });
+        } catch (err) {
+            console.error('Error fetching student data:', err);
+            setError(err instanceof Error ? err.message : 'Failed to load data');
+            setData({ boys: 20, girls: 40 });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (loading) {
         return (
-            <div className="bg-white rounded-xl w-full h-full p-4">
+            <div className="bg-white rounded-xl w-full h-full p-4 shadow-sm border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
                     <Skeleton width="60%" height="1.5rem" />
                     <Skeleton shape="circle" size="1.5rem" />
@@ -79,10 +90,9 @@ const CountChartContainer = () => {
 
     return (
         <div className="bg-white rounded-xl w-full h-full p-4 shadow-sm border border-gray-100">
-            {/* TITLE */}
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-lg font-semibold text-gray-800">Students</h1>
-                <Image src="/assets/moreDark.png" alt="More options" width={20} height={20} />
+                <MoreHorizontal size={20} className="text-gray-400 cursor-pointer hover:text-gray-600" />
             </div>
             
             {error ? (
@@ -94,10 +104,8 @@ const CountChartContainer = () => {
                 </div>
             ) : (
                 <>
-                    {/* CHART */}
                     <CountChart boys={data.boys} girls={data.girls} />
                     
-                    {/* BOTTOM */}
                     <div className="flex justify-center gap-8 lg:gap-16 mt-4">
                         <div className="flex flex-col items-center gap-1">
                             <div className="w-5 h-5 bg-lamaSky rounded-full" />

@@ -10,11 +10,25 @@ import { Divider } from "primereact/divider";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { signOut } from "next-auth/react";
-import { FaSearch, FaEnvelope, FaBell, FaUser, FaSignOutAlt, FaCog, FaUserCircle } from 'react-icons/fa';
+import { 
+    Search, 
+    Mail, 
+    Bell, 
+    User, 
+    LogOut, 
+    Settings, 
+    UserCircle,
+    Shield,
+    HelpCircle,
+    Palette,
+    Key,
+    Database
+} from 'lucide-react';
 
 const Navbar = () => {
     const { data: session } = useSession();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [searchExpanded, setSearchExpanded] = useState(false);
     
     const notificationPanel = useRef<OverlayPanel>(null);
     const profilePanel = useRef<OverlayPanel>(null);
@@ -79,86 +93,103 @@ const Navbar = () => {
     };
 
     const NotificationItem = ({ notification }: { notification: any }) => (
-        <div className={`p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.unread ? 'bg-blue-50' : ''}`}>
+        <div className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${notification.unread ? 'bg-blue-50' : ''}`}>
             <div className="flex items-start gap-3">
-                <div className={`w-2 h-2 rounded-full mt-2 ${
+                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
                     notification.type === 'info' ? 'bg-blue-500' :
                     notification.type === 'warning' ? 'bg-yellow-500' :
                     'bg-green-500'
                 }`} />
-                <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-gray-800">{notification.title}</h4>
-                    <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-gray-800 truncate">{notification.title}</h4>
+                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
                     <span className="text-xs text-gray-400 mt-1">{notification.time}</span>
                 </div>
                 {notification.unread && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
                 )}
             </div>
         </div>
     );
+
+    const settingsItems = [
+        { icon: User, label: 'My Profile', href: '/dashboard/profile' },
+        { icon: Settings, label: 'Preferences', href: '/dashboard/settings/preferences' },
+        { icon: Shield, label: 'Security', href: '/dashboard/settings/security' },
+        { icon: Palette, label: 'Appearance', href: '/dashboard/settings/appearance' },
+        { icon: Database, label: 'Privacy', href: '/dashboard/settings/privacy' },
+        ...(role === 'super' || role === 'admin' ? [
+            { icon: Key, label: 'API Keys', href: '/dashboard/settings/api' }
+        ] : []),
+        { icon: HelpCircle, label: 'Help & Support', href: '/dashboard/help' },
+    ];
 
     return (
         <>
             <Toast ref={toast} />
             <ConfirmDialog />
             
-            <header className="flex items-center justify-between bg-white px-4 py-3 shadow-sm border-b border-gray-200 sticky top-0 z-40">
+            <header className="flex items-center justify-between bg-white/95 backdrop-blur-sm px-4 lg:px-6 py-3 shadow-sm border-b border-gray-200 sticky top-0 z-40">
                 {/* SEARCH BAR */}
-                <div className="hidden md:flex items-center space-x-2 text-gray-600 text-sm bg-gray-50 rounded-full px-4 py-2 flex-grow max-w-md">
-                    <FaSearch className="w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search students, teachers, classes..."
-                        className="bg-transparent outline-none w-full placeholder-gray-400 py-1"
-                    />
+                <div className="flex items-center flex-1 max-w-2xl">
+                    <div className={`
+                        flex items-center space-x-3 text-gray-600 text-sm bg-gray-50 rounded-full px-4 py-2.5 
+                        transition-all duration-300 border border-gray-200 hover:border-gray-300 focus-within:border-blue-400 focus-within:bg-white
+                        ${searchExpanded ? 'w-full' : 'w-auto'}
+                    `}>
+                        <Search size={18} className="text-gray-400 flex-shrink-0" />
+                        <input
+                            type="text"
+                            placeholder="Search students, teachers, classes..."
+                            className="bg-transparent outline-none w-full placeholder-gray-400 py-1 min-w-0"
+                            onFocus={() => setSearchExpanded(true)}
+                            onBlur={() => setSearchExpanded(false)}
+                        />
+                        <kbd className="hidden sm:inline-flex items-center px-2 py-1 text-xs font-medium text-gray-400 bg-gray-100 rounded border border-gray-200">
+                            ⌘K
+                        </kbd>
+                    </div>
                 </div>
 
-                {/* Mobile Search Button */}
-                <div className="md:hidden">
-                    <Button
-                        icon={<FaSearch />}
-                        className="p-button-text p-button-rounded"
-                        aria-label="Search"
-                    />
-                </div>
-
-                {/* ICONS & USER */}
-                <div className="flex items-center space-x-2 lg:space-x-4">
+                {/* ACTIONS & USER */}
+                <div className="flex items-center space-x-2 lg:space-x-3 ml-4">
                     {/* Messages */}
                     <Button
-                        icon={<FaEnvelope />}
-                        className="p-button-text p-button-rounded relative"
+                        className="p-button-text p-button-rounded relative hover:bg-gray-100 transition-colors"
                         aria-label="Messages"
-                    />
+                    >
+                        <Mail size={20} className="text-gray-600" />
+                        <Badge value="3" severity="info" className="absolute -top-1 -right-1 text-xs" />
+                    </Button>
 
                     {/* Notifications */}
                     <div className="relative">
                         <Button
-                            icon={<FaBell />}
-                            className="p-button-text p-button-rounded"
+                            className="p-button-text p-button-rounded hover:bg-gray-100 transition-colors"
                             onClick={(e) => notificationPanel.current?.toggle(e)}
                             aria-label="Notifications"
-                        />
+                        >
+                            <Bell size={20} className="text-gray-600" />
+                        </Button>
                         {unreadCount > 0 && (
                             <Badge 
                                 value={unreadCount} 
                                 severity="danger" 
-                                className="absolute -top-1 -right-1"
+                                className="absolute -top-1 -right-1 text-xs"
                             />
                         )}
                         
                         <OverlayPanel 
                             ref={notificationPanel} 
-                            className="w-80"
+                            className="w-80 max-w-[90vw]"
                             showCloseIcon={false}
                         >
                             <div className="p-0">
-                                <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
                                     <h3 className="font-semibold text-gray-800">Notifications</h3>
                                     <Button
                                         label="Mark all read"
-                                        className="p-button-text p-button-sm"
+                                        className="p-button-text p-button-sm text-blue-600 hover:text-blue-700"
                                     />
                                 </div>
                                 <div className="max-h-80 overflow-y-auto">
@@ -169,10 +200,10 @@ const Navbar = () => {
                                         />
                                     ))}
                                 </div>
-                                <div className="p-3 border-t border-gray-200 text-center">
+                                <div className="p-3 border-t border-gray-200 text-center bg-gray-50">
                                     <Button
                                         label="View All Notifications"
-                                        className="p-button-text p-button-sm"
+                                        className="p-button-text p-button-sm text-blue-600 hover:text-blue-700"
                                     />
                                 </div>
                             </div>
@@ -180,10 +211,10 @@ const Navbar = () => {
                     </div>
 
                     {/* User Profile */}
-                    <div className="flex items-center gap-2 lg:gap-3">
+                    <div className="flex items-center gap-3">
                         {/* User Info - Hidden on mobile */}
                         <div className="hidden lg:flex flex-col text-right">
-                            <span className="text-sm font-medium text-gray-800 truncate max-w-32">
+                            <span className="text-sm font-semibold text-gray-800 truncate max-w-32">
                                 {userName}
                             </span>
                             <span className="text-xs text-gray-500 capitalize">
@@ -194,61 +225,64 @@ const Navbar = () => {
                         {/* Profile Avatar */}
                         <div className="relative">
                             <Avatar
-                                icon={<FaUserCircle />}
-                                className="cursor-pointer bg-blue-500 text-white"
+                                className="cursor-pointer bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
                                 shape="circle"
                                 size="normal"
                                 onClick={(e) => profilePanel.current?.toggle(e)}
-                            />
+                            >
+                                <UserCircle size={24} />
+                            </Avatar>
                             
                             <OverlayPanel 
                                 ref={profilePanel} 
-                                className="w-64"
+                                className="w-72 max-w-[90vw]"
                                 showCloseIcon={false}
                             >
                                 <div className="p-0">
                                     {/* Profile Header */}
-                                    <div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                                        <div className="flex items-center gap-3">
+                                    <div className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                        <div className="flex items-center gap-4">
                                             <Avatar
-                                                icon={<FaUserCircle />}
-                                                className="bg-white/20"
+                                                className="bg-white/20 backdrop-blur-sm"
                                                 shape="circle"
                                                 size="large"
-                                            />
-                                            <div>
-                                                <h4 className="font-semibold">{userName}</h4>
-                                                <p className="text-sm opacity-90">{userEmail}</p>
-                                                <span className="text-xs bg-white/20 px-2 py-1 rounded-full capitalize">
+                                            >
+                                                <UserCircle size={32} />
+                                            </Avatar>
+                                            <div className="min-w-0 flex-1">
+                                                <h4 className="font-semibold text-lg truncate">{userName}</h4>
+                                                <p className="text-sm opacity-90 truncate">{userEmail}</p>
+                                                <span className="text-xs bg-white/20 px-2 py-1 rounded-full capitalize mt-2 inline-block">
                                                     {role}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Profile Menu */}
+                                    {/* Settings Menu */}
                                     <div className="p-2">
-                                        <Button
-                                            icon={<FaUser />}
-                                            label="My Profile"
-                                            className="p-button-text w-full justify-start"
-                                        />
-                                        <Button
-                                            icon={<FaCog />}
-                                            label="Settings"
-                                            className="p-button-text w-full justify-start"
-                                        />
+                                        {settingsItems.map((item, index) => (
+                                            <Button
+                                                key={index}
+                                                className="p-button-text w-full justify-start hover:bg-gray-50 transition-colors"
+                                                onClick={() => window.location.href = item.href}
+                                            >
+                                                <item.icon size={18} className="mr-3 text-gray-600" />
+                                                <span className="text-gray-700">{item.label}</span>
+                                            </Button>
+                                        ))}
                                         
                                         <Divider className="my-2" />
                                         
                                         <Button
-                                            icon={<FaSignOutAlt />}
-                                            label={isLoggingOut ? "Signing out..." : "Sign Out"}
-                                            className="p-button-text w-full justify-start text-red-600 hover:bg-red-50"
+                                            className="p-button-text w-full justify-start text-red-600 hover:bg-red-50 transition-colors"
                                             onClick={handleLogout}
                                             loading={isLoggingOut}
                                             disabled={isLoggingOut}
-                                        />
+                                        >
+                                            <LogOut size={18} className="mr-3" />
+                                            <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
+                                        </Button>
                                     </div>
                                 </div>
                             </OverlayPanel>
