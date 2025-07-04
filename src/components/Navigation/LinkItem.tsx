@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Tooltip } from "primereact/tooltip";
-import { LucideIcon } from "lucide-react";
+import { DivideIcon as LucideIcon } from "lucide-react";
 import type { FC } from "react";
 
 interface LinkItemProps {
