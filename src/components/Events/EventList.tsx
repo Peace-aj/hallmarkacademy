@@ -10,6 +10,9 @@ interface Event {
     startTime: string;
     endTime: string;
     classId?: string;
+    class?: {
+        name: string;
+    };
 }
 
 const EventList = ({ dateParam }: { dateParam: string | undefined }) => {
@@ -24,46 +27,26 @@ const EventList = ({ dateParam }: { dateParam: string | undefined }) => {
             setLoading(true);
             setError(null);
 
-            // For now, we'll use mock data since there's no events API endpoint
-            // In a real application, you would fetch from /api/events
-            const mockEvents = [
-                {
-                    id: 1,
-                    title: "Mathematics Quiz",
-                    description: "Weekly mathematics assessment for JSS 2 students",
-                    startTime: new Date().toISOString(),
-                    endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-                    classId: null
-                },
-                {
-                    id: 2,
-                    title: "Science Fair Preparation",
-                    description: "Students prepare their projects for the upcoming science fair",
-                    startTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
-                    endTime: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
-                    classId: null
-                },
-                {
-                    id: 3,
-                    title: "Parent-Teacher Meeting",
-                    description: "Monthly meeting to discuss student progress",
-                    startTime: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
-                    endTime: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
-                    classId: null
-                }
-            ];
+            // Format date for API query
+            const fromDate = new Date(date);
+            fromDate.setHours(0, 0, 0, 0);
+            const toDate = new Date(date);
+            toDate.setHours(23, 59, 59, 999);
 
-            // Filter events for the selected date
-            const selectedDate = date.toDateString();
-            const filteredEvents = mockEvents.filter(event => {
-                const eventDate = new Date(event.startTime).toDateString();
-                return eventDate === selectedDate;
+            const response = await fetch(`/api/events?from=${fromDate.toISOString()}&to=${toDate.toISOString()}&limit=10`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                cache: 'default'
             });
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 300));
-            
-            setEvents(filteredEvents);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            setEvents(result.data || []);
         } catch (err) {
             console.error('Error fetching events:', err);
             setError(err instanceof Error ? err.message : 'Failed to load events');
@@ -135,7 +118,12 @@ const EventList = ({ dateParam }: { dateParam: string | undefined }) => {
                             })}
                         </span>
                     </div>
-                    <p className="text-gray-600 text-sm leading-relaxed">{event.description}</p>
+                    <p className="text-gray-600 text-sm leading-relaxed mb-2">{event.description}</p>
+                    {event.class && (
+                        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                            {event.class.name}
+                        </span>
+                    )}
                 </div>
             ))}
         </div>

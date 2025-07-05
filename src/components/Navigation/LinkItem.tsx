@@ -13,19 +13,27 @@ interface LinkItemProps {
         label: string;
     };
     isCollapsed?: boolean;
+    onMobileClick?: () => void;
 }
 
-const LinkItem: FC<LinkItemProps> = ({ item, isCollapsed = false }) => {
+const LinkItem: FC<LinkItemProps> = ({ item, isCollapsed = false, onMobileClick }) => {
     const pathname = usePathname();
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
     const Icon = item.icon;
     const tooltipId = `tooltip-${item.label.replace(/\s+/g, '-').toLowerCase()}`;
+
+    const handleClick = () => {
+        if (onMobileClick) {
+            onMobileClick();
+        }
+    };
 
     return (
         <>
             {isCollapsed && <Tooltip target={`.${tooltipId}`} position="right" />}
             <Link
                 href={item.href}
+                onClick={handleClick}
                 className={`
                     flex items-center gap-3 px-3 py-3 rounded-xl text-gray-200 
                     hover:bg-gray-700/50 hover:text-white transition-all duration-300 

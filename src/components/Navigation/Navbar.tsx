@@ -22,10 +22,15 @@ import {
     HelpCircle,
     Palette,
     Key,
-    Database
+    Database,
+    Menu as MenuIcon
 } from 'lucide-react';
 
-const Navbar = () => {
+interface NavbarProps {
+    onMobileMenuToggle?: () => void;
+}
+
+const Navbar = ({ onMobileMenuToggle }: NavbarProps) => {
     const { data: session } = useSession();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [searchExpanded, setSearchExpanded] = useState(false);
@@ -130,12 +135,22 @@ const Navbar = () => {
             <ConfirmDialog />
             
             <header className="flex items-center justify-between bg-white/95 backdrop-blur-sm px-4 lg:px-6 py-3 shadow-sm border-b border-gray-200 sticky top-0 z-40">
-                {/* SEARCH BAR */}
-                <div className="flex items-center flex-1 max-w-2xl">
+                {/* Mobile Menu Button & Search */}
+                <div className="flex items-center gap-3 flex-1 max-w-2xl">
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={onMobileMenuToggle}
+                        className="md:hidden w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                        aria-label="Toggle mobile menu"
+                    >
+                        <MenuIcon size={20} />
+                    </button>
+
+                    {/* Search Bar */}
                     <div className={`
                         flex items-center space-x-3 text-gray-600 text-sm bg-gray-50 rounded-full px-4 py-2.5 
                         transition-all duration-300 border border-gray-200 hover:border-gray-300 focus-within:border-blue-400 focus-within:bg-white
-                        ${searchExpanded ? 'w-full' : 'w-auto'}
+                        ${searchExpanded ? 'flex-1' : 'flex-1 max-w-md'}
                     `}>
                         <Search size={18} className="text-gray-400 flex-shrink-0" />
                         <input
@@ -151,7 +166,7 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* ACTIONS & USER */}
+                {/* Actions & User */}
                 <div className="flex items-center space-x-2 lg:space-x-3 ml-4">
                     {/* Messages */}
                     <Button

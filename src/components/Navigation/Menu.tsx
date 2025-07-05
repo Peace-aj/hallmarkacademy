@@ -27,7 +27,6 @@ import {
     ChevronLeft,
     ChevronRight
 } from "lucide-react";
-import { useState } from "react";
 import LinkItem from './LinkItem';
 
 const menuItems = [
@@ -199,21 +198,22 @@ const menuItems = [
 interface MenuProps {
     isCollapsed: boolean;
     onToggle: () => void;
+    onMobileItemClick?: () => void;
 }
 
-const Menu = ({ isCollapsed, onToggle }: MenuProps) => {
+const Menu = ({ isCollapsed, onToggle, onMobileItemClick }: MenuProps) => {
     const { data: session, status } = useSession();
     
     if (status === "loading") {
         return (
-            <aside className={`p-3 h-full space-y-6 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
+            <aside className={`h-full space-y-6 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
                 {/* Toggle Button Skeleton */}
-                <div className="flex justify-end mb-4">
+                <div className="flex justify-end p-3">
                     <Skeleton shape="circle" size="2rem" />
                 </div>
                 
                 {[1, 2, 3].map((section) => (
-                    <div key={section}>
+                    <div key={section} className="px-3">
                         {!isCollapsed && <Skeleton width="60%" height="0.8rem" className="mb-3" />}
                         <div className="space-y-2">
                             {[1, 2, 3].map((item) => (
@@ -233,8 +233,8 @@ const Menu = ({ isCollapsed, onToggle }: MenuProps) => {
 
     return (
         <aside className={`h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
-            {/* Toggle Button */}
-            <div className="flex justify-end p-3 border-b border-gray-700">
+            {/* Toggle Button - Only show on desktop */}
+            <div className="hidden md:flex justify-end p-3 border-b border-gray-700">
                 <button
                     onClick={onToggle}
                     className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors duration-200"
@@ -266,6 +266,7 @@ const Menu = ({ isCollapsed, onToggle }: MenuProps) => {
                                                 href: typeof item.href === 'function' ? item.href(role) : item.href
                                             }}
                                             isCollapsed={isCollapsed}
+                                            onMobileClick={onMobileItemClick}
                                         />
                                     </li>
                                 ))}
