@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "primereact/skeleton";
 
@@ -21,52 +21,53 @@ const Announcements = () => {
     const userId = session?.user?.id;
     const role = session?.user?.role;
 
-    useEffect(() => {
-        const fetchAnnouncements = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+    const fetchAnnouncements = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-                // For now, we'll use mock data since there's no announcements API endpoint
-                // In a real application, you would fetch from /api/announcements
-                const mockAnnouncements = [
-                    {
-                        id: 1,
-                        title: "New Academic Session",
-                        description: "The new academic session will commence on September 15th. All students are expected to report on time.",
-                        date: new Date().toISOString(),
-                        classId: null
-                    },
-                    {
-                        id: 2,
-                        title: "Parent-Teacher Meeting",
-                        description: "A parent-teacher meeting has been scheduled for next Friday at 2:00 PM in the school hall.",
-                        date: new Date(Date.now() - 86400000).toISOString(),
-                        classId: null
-                    },
-                    {
-                        id: 3,
-                        title: "Sports Day Preparation",
-                        description: "All students should prepare for the upcoming sports day. Training sessions will begin next week.",
-                        date: new Date(Date.now() - 172800000).toISOString(),
-                        classId: null
-                    }
-                ];
+            // For now, we'll use mock data since there's no announcements API endpoint
+            // In a real application, you would fetch from /api/announcements
+            const mockAnnouncements = [
+                {
+                    id: 1,
+                    title: "New Academic Session",
+                    description: "The new academic session will commence on September 15th. All students are expected to report on time.",
+                    date: new Date().toISOString(),
+                    classId: null
+                },
+                {
+                    id: 2,
+                    title: "Parent-Teacher Meeting",
+                    description: "A parent-teacher meeting has been scheduled for next Friday at 2:00 PM in the school hall.",
+                    date: new Date(Date.now() - 86400000).toISOString(),
+                    classId: null
+                },
+                {
+                    id: 3,
+                    title: "Sports Day Preparation",
+                    description: "All students should prepare for the upcoming sports day. Training sessions will begin next week.",
+                    date: new Date(Date.now() - 172800000).toISOString(),
+                    classId: null
+                }
+            ];
 
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 800));
-                
-                setAnnouncements(mockAnnouncements);
-            } catch (err) {
-                console.error('Error fetching announcements:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load announcements');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAnnouncements();
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            setAnnouncements(mockAnnouncements);
+        } catch (err) {
+            console.error('Error fetching announcements:', err);
+            setError(err instanceof Error ? err.message : 'Failed to load announcements');
+        } finally {
+            setLoading(false);
+        }
     }, [userId, role]);
+
+    useEffect(() => {
+        // Only fetch once when component mounts or user changes
+        fetchAnnouncements();
+    }, [fetchAnnouncements]);
 
     if (loading) {
         return (
@@ -104,6 +105,12 @@ const Announcements = () => {
                     <div className="text-4xl mb-2">📢</div>
                     <p>Failed to load announcements</p>
                     <p className="text-sm mt-1">Showing sample data</p>
+                    <button 
+                        onClick={fetchAnnouncements}
+                        className="mt-2 text-blue-600 hover:text-blue-800 text-sm underline"
+                    >
+                        Retry
+                    </button>
                 </div>
             ) : null}
             
