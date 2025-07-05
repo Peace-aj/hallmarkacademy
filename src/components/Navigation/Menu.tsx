@@ -23,8 +23,11 @@ import {
     Bell,
     Palette,
     Database,
-    Key
+    Key,
+    ChevronLeft,
+    ChevronRight
 } from "lucide-react";
+import { useState } from "react";
 import LinkItem from './LinkItem';
 
 const menuItems = [
@@ -193,20 +196,30 @@ const menuItems = [
     },
 ];
 
-const Menu = () => {
+interface MenuProps {
+    isCollapsed: boolean;
+    onToggle: () => void;
+}
+
+const Menu = ({ isCollapsed, onToggle }: MenuProps) => {
     const { data: session, status } = useSession();
     
     if (status === "loading") {
         return (
-            <aside className="p-3 h-full space-y-6">
+            <aside className={`p-3 h-full space-y-6 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
+                {/* Toggle Button Skeleton */}
+                <div className="flex justify-end mb-4">
+                    <Skeleton shape="circle" size="2rem" />
+                </div>
+                
                 {[1, 2, 3].map((section) => (
                     <div key={section}>
-                        <Skeleton width="60%" height="0.8rem" className="mb-3" />
+                        {!isCollapsed && <Skeleton width="60%" height="0.8rem" className="mb-3" />}
                         <div className="space-y-2">
                             {[1, 2, 3].map((item) => (
                                 <div key={item} className="flex items-center gap-3 p-2">
                                     <Skeleton shape="circle" size="1.5rem" />
-                                    <Skeleton width="70%" height="1rem" className="hidden lg:block" />
+                                    {!isCollapsed && <Skeleton width="70%" height="1rem" />}
                                 </div>
                             ))}
                         </div>
@@ -219,8 +232,19 @@ const Menu = () => {
     const role = session?.user?.role || 'guest';
 
     return (
-        <aside className="p-3 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700">
-            <nav className="space-y-6">
+        <aside className={`h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-700 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
+            {/* Toggle Button */}
+            <div className="flex justify-end p-3 border-b border-gray-700">
+                <button
+                    onClick={onToggle}
+                    className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors duration-200"
+                    title={isCollapsed ? "Expand Menu" : "Collapse Menu"}
+                >
+                    {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                </button>
+            </div>
+
+            <nav className="p-3 space-y-6">
                 {menuItems.map(section => {
                     const visibleItems = section.items.filter(item => item.visible.includes(role));
                     
@@ -228,9 +252,11 @@ const Menu = () => {
                     
                     return (
                         <div key={section.title}>
-                            <h3 className="text-white/70 uppercase tracking-wider text-xs mb-3 px-3 font-semibold hidden lg:block">
-                                {section.title}
-                            </h3>
+                            {!isCollapsed && (
+                                <h3 className="text-white/70 uppercase tracking-wider text-xs mb-3 px-3 font-semibold">
+                                    {section.title}
+                                </h3>
+                            )}
                             <ul className="space-y-1">
                                 {visibleItems.map(item => (
                                     <li key={item.label}>
@@ -238,7 +264,8 @@ const Menu = () => {
                                             item={{
                                                 ...item,
                                                 href: typeof item.href === 'function' ? item.href(role) : item.href
-                                            }} 
+                                            }}
+                                            isCollapsed={isCollapsed}
                                         />
                                     </li>
                                 ))}
