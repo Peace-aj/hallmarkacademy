@@ -12,9 +12,10 @@ interface LinkItemProps {
         icon: LucideIcon;
         label: string;
     };
+    isCollapsed?: boolean;
 }
 
-const LinkItem: FC<LinkItemProps> = ({ item }) => {
+const LinkItem: FC<LinkItemProps> = ({ item, isCollapsed = false }) => {
     const pathname = usePathname();
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
     const Icon = item.icon;
@@ -22,7 +23,7 @@ const LinkItem: FC<LinkItemProps> = ({ item }) => {
 
     return (
         <>
-            <Tooltip target={`.${tooltipId}`} position="right" />
+            {isCollapsed && <Tooltip target={`.${tooltipId}`} position="right" />}
             <Link
                 href={item.href}
                 className={`
@@ -30,10 +31,11 @@ const LinkItem: FC<LinkItemProps> = ({ item }) => {
                     hover:bg-gray-700/50 hover:text-white transition-all duration-300 
                     group relative overflow-hidden
                     ${isActive ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/25' : ''}
+                    ${isCollapsed ? 'justify-center' : ''}
                 `}
             >
                 {/* Active indicator */}
-                {isActive && (
+                {isActive && !isCollapsed && (
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full" />
                 )}
                 
@@ -45,13 +47,15 @@ const LinkItem: FC<LinkItemProps> = ({ item }) => {
                 `} />
                 
                 <div className={`
-                    ${tooltipId}
+                    ${isCollapsed ? tooltipId : ''}
                     flex items-center justify-center w-5 h-5 flex-shrink-0 relative z-10
                     ${isActive ? 'scale-110' : 'group-hover:scale-105'}
                     transition-transform duration-300
                 `}
-                data-pr-tooltip={item.label}
-                data-pr-position="right"
+                {...(isCollapsed ? {
+                    'data-pr-tooltip': item.label,
+                    'data-pr-position': 'right'
+                } : {})}
                 >
                     <Icon 
                         size={20} 
@@ -62,13 +66,15 @@ const LinkItem: FC<LinkItemProps> = ({ item }) => {
                     />
                 </div>
                 
-                <span className={`
-                    hidden lg:block font-medium truncate relative z-10
-                    ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
-                    transition-colors duration-300
-                `}>
-                    {item.label}
-                </span>
+                {!isCollapsed && (
+                    <span className={`
+                        font-medium truncate relative z-10
+                        ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}
+                        transition-colors duration-300
+                    `}>
+                        {item.label}
+                    </span>
+                )}
                 
                 {/* Shine effect on hover */}
                 <div className={`

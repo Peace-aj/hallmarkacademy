@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Skeleton } from "primereact/skeleton";
 import Image from "next/image";
 import EventCalendar from "./EventCalendar";
@@ -12,7 +12,11 @@ interface EventCalendarContainerProps {
 
 const EventCalendarContainer = ({ searchParams }: EventCalendarContainerProps) => {
     const [loading, setLoading] = useState(true);
-    const { date } = searchParams;
+
+    // Memoize the date to prevent unnecessary re-renders
+    const selectedDate = useMemo(() => {
+        return searchParams?.date || new Date().toISOString().split('T')[0];
+    }, [searchParams?.date]);
 
     useEffect(() => {
         // Simulate loading time for calendar
@@ -53,7 +57,7 @@ const EventCalendarContainer = ({ searchParams }: EventCalendarContainerProps) =
                 />
             </div>
             <div className="flex flex-col gap-4">
-                <EventList dateParam={date} />
+                <EventList dateParam={selectedDate} />
             </div>
         </div>
     );

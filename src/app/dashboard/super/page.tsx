@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Users, GraduationCap, School, BookOpen, TrendingUp, Calendar } from "lucide-react";
 
 import UserCard from "@/components/Card/UserCard";
@@ -11,10 +11,6 @@ import AttendanceChartContainer from "@/components/Charts/AttendanceChartContain
 import FinanceChart from "@/components/Charts/FinanceChart";
 import EventCalendarContainer from "@/components/Calendar/EventCalendarContainer";
 import Announcements from "@/components/Events/Announcements";
-
-interface SuperProps {
-    searchParams: { [key: string]: string | undefined };
-}
 
 interface DashboardStats {
     students: number;
@@ -28,11 +24,20 @@ interface DashboardStats {
     studentsByGender: Array<{ gender: string; _count: { _all: number } }>;
 }
 
-const Super = ({ searchParams }: SuperProps) => {
+const Super = () => {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Memoize searchParams to prevent unnecessary re-renders
+    const searchParams = useMemo(() => {
+        if (typeof window !== 'undefined') {
+            return new URLSearchParams(window.location.search);
+        }
+        return new URLSearchParams();
+    }, []);
 
     useEffect(() => {
         if (status === "loading") return;
@@ -47,19 +52,51 @@ const Super = ({ searchParams }: SuperProps) => {
             return;
         }
 
+        // Only fetch data once when component mounts
         fetchDashboardData();
     }, [session, status, router]);
 
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`/api/stats?role=super`);
-            if (!response.ok) throw new Error('Failed to fetch stats');
+            setError(null);
+            
+            const response = await fetch(`/api/stats?role=super`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Add cache control to prevent excessive requests
+                cache: 'default'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
             const data = await response.json();
-            setStats(data.stats);
+            
+            if (data.success && data.stats) {
+                setStats(data.stats);
+            } else {
+                throw new Error(data.details || 'Failed to fetch stats');
+            }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
+            setError(error instanceof Error ? error.message : 'Failed to load dashboard data');
+            
+            // Set fallback data to prevent blank dashboard
+            setStats({
+                students: 0,
+                teachers: 0,
+                classes: 0,
+                subjects: 0,
+                parents: 0,
+                admins: 0,
+                recentStudents: 0,
+                recentTeachers: 0,
+                studentsByGender: []
+            });
         } finally {
             setLoading(false);
         }
@@ -78,6 +115,24 @@ const Super = ({ searchParams }: SuperProps) => {
 
     if (!session || session.user.role !== "super") {
         return null;
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-center">
+                    <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">Dashboard Error</h2>
+                    <p className="text-gray-600 mb-4">{error}</p>
+                    <button 
+                        onClick={fetchDashboardData}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -161,7 +216,7 @@ const Super = ({ searchParams }: SuperProps) => {
 
                     {/* RIGHT COLUMN */}
                     <div className="w-full xl:w-1/3 flex flex-col gap-8">
-                        <EventCalendarContainer searchParams={searchParams} />
+                        <EventCalendarContainer searchParams={Object.fromEntries(searchParams)} />
                         <Announcements />
                     </div>
                 </div>
