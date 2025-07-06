@@ -2,11 +2,9 @@
 
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { OverlayPanel } from "primereact/overlaypanel";
 import { Badge } from "primereact/badge";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
-import { Divider } from "primereact/divider";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { signOut } from "next-auth/react";
@@ -23,7 +21,8 @@ import {
     Palette,
     Key,
     Database,
-    Menu as MenuIcon
+    Menu as MenuIcon,
+    ChevronDown
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -34,9 +33,9 @@ const Navbar = ({ onMobileMenuToggle }: NavbarProps) => {
     const { data: session } = useSession();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [searchExpanded, setSearchExpanded] = useState(false);
+    const [notificationOpen, setNotificationOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
     
-    const notificationPanel = useRef<OverlayPanel>(null);
-    const profilePanel = useRef<OverlayPanel>(null);
     const toast = useRef<Toast>(null);
 
     const role = session?.user?.role || 'Guest';
@@ -97,26 +96,6 @@ const Navbar = ({ onMobileMenuToggle }: NavbarProps) => {
         });
     };
 
-    const NotificationItem = ({ notification }: { notification: any }) => (
-        <div className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${notification.unread ? 'bg-blue-50' : ''}`}>
-            <div className="flex items-start gap-3">
-                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                    notification.type === 'info' ? 'bg-blue-500' :
-                    notification.type === 'warning' ? 'bg-yellow-500' :
-                    'bg-green-500'
-                }`} />
-                <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm text-gray-800 truncate">{notification.title}</h4>
-                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
-                    <span className="text-xs text-gray-400 mt-1">{notification.time}</span>
-                </div>
-                {notification.unread && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                )}
-            </div>
-        </div>
-    );
-
     const settingsItems = [
         { icon: User, label: 'My Profile', href: '/dashboard/profile' },
         { icon: Settings, label: 'Preferences', href: '/dashboard/settings/preferences' },
@@ -169,60 +148,68 @@ const Navbar = ({ onMobileMenuToggle }: NavbarProps) => {
                 {/* Actions & User */}
                 <div className="flex items-center space-x-2 lg:space-x-3 ml-4">
                     {/* Messages */}
-                    <Button
-                        className="p-button-text p-button-rounded relative hover:bg-gray-100 transition-colors"
-                        aria-label="Messages"
-                    >
-                        <Mail size={20} className="text-gray-600" />
-                        <Badge value="3" severity="info" className="absolute -top-1 -right-1 text-xs" />
-                    </Button>
+                    <div className="relative">
+                        <button className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+                            <Mail size={20} />
+                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+                                3
+                            </span>
+                        </button>
+                    </div>
 
                     {/* Notifications */}
                     <div className="relative">
-                        <Button
-                            className="p-button-text p-button-rounded hover:bg-gray-100 transition-colors"
-                            onClick={(e) => notificationPanel.current?.toggle(e)}
-                            aria-label="Notifications"
+                        <button 
+                            className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                            onClick={() => setNotificationOpen(!notificationOpen)}
                         >
-                            <Bell size={20} className="text-gray-600" />
-                        </Button>
-                        {unreadCount > 0 && (
-                            <Badge 
-                                value={unreadCount} 
-                                severity="danger" 
-                                className="absolute -top-1 -right-1 text-xs"
-                            />
-                        )}
+                            <Bell size={20} />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </button>
                         
-                        <OverlayPanel 
-                            ref={notificationPanel} 
-                            className="w-80 max-w-[90vw]"
-                            showCloseIcon={false}
-                        >
-                            <div className="p-0">
-                                <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-                                    <h3 className="font-semibold text-gray-800">Notifications</h3>
-                                    <Button
-                                        label="Mark all read"
-                                        className="p-button-text p-button-sm text-blue-600 hover:text-blue-700"
-                                    />
+                        {/* Notifications Dropdown */}
+                        {notificationOpen && (
+                            <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
+                                <div className="p-4 border-b border-gray-100">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-semibold text-gray-800">Notifications</h3>
+                                        <button className="text-sm text-blue-600 hover:text-blue-700">
+                                            Mark all read
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="max-h-80 overflow-y-auto">
                                     {notifications.map((notification) => (
-                                        <NotificationItem 
-                                            key={notification.id} 
-                                            notification={notification} 
-                                        />
+                                        <div key={notification.id} className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${notification.unread ? 'bg-blue-50' : ''}`}>
+                                            <div className="flex items-start gap-3">
+                                                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                                                    notification.type === 'info' ? 'bg-blue-500' :
+                                                    notification.type === 'warning' ? 'bg-yellow-500' :
+                                                    'bg-green-500'
+                                                }`} />
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-sm text-gray-800 truncate">{notification.title}</h4>
+                                                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
+                                                    <span className="text-xs text-gray-400 mt-1">{notification.time}</span>
+                                                </div>
+                                                {notification.unread && (
+                                                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                                                )}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="p-3 border-t border-gray-200 text-center bg-gray-50">
-                                    <Button
-                                        label="View All Notifications"
-                                        className="p-button-text p-button-sm text-blue-600 hover:text-blue-700"
-                                    />
+                                    <button className="text-sm text-blue-600 hover:text-blue-700">
+                                        View All Notifications
+                                    </button>
                                 </div>
                             </div>
-                        </OverlayPanel>
+                        )}
                     </div>
 
                     {/* User Profile */}
@@ -237,33 +224,27 @@ const Navbar = ({ onMobileMenuToggle }: NavbarProps) => {
                             </span>
                         </div>
 
-                        {/* Profile Avatar */}
+                        {/* Profile Dropdown */}
                         <div className="relative">
-                            <Avatar
-                                className="cursor-pointer bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-                                shape="circle"
-                                size="normal"
-                                onClick={(e) => profilePanel.current?.toggle(e)}
+                            <button
+                                className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                onClick={() => setProfileOpen(!profileOpen)}
                             >
-                                <UserCircle size={24} />
-                            </Avatar>
+                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full flex items-center justify-center">
+                                    <UserCircle size={20} />
+                                </div>
+                                <ChevronDown size={16} className="text-gray-400" />
+                            </button>
                             
-                            <OverlayPanel 
-                                ref={profilePanel} 
-                                className="w-72 max-w-[90vw]"
-                                showCloseIcon={false}
-                            >
-                                <div className="p-0">
+                            {/* Profile Dropdown Menu */}
+                            {profileOpen && (
+                                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
                                     {/* Profile Header */}
-                                    <div className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                    <div className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-xl">
                                         <div className="flex items-center gap-4">
-                                            <Avatar
-                                                className="bg-white/20 backdrop-blur-sm"
-                                                shape="circle"
-                                                size="large"
-                                            >
-                                                <UserCircle size={32} />
-                                            </Avatar>
+                                            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                                <UserCircle size={24} />
+                                            </div>
                                             <div className="min-w-0 flex-1">
                                                 <h4 className="font-semibold text-lg truncate">{userName}</h4>
                                                 <p className="text-sm opacity-90 truncate">{userEmail}</p>
@@ -277,34 +258,44 @@ const Navbar = ({ onMobileMenuToggle }: NavbarProps) => {
                                     {/* Settings Menu */}
                                     <div className="p-2">
                                         {settingsItems.map((item, index) => (
-                                            <Button
+                                            <button
                                                 key={index}
-                                                className="p-button-text w-full justify-start hover:bg-gray-50 transition-colors"
+                                                className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
                                                 onClick={() => window.location.href = item.href}
                                             >
-                                                <item.icon size={18} className="mr-3 text-gray-600" />
+                                                <item.icon size={18} className="text-gray-600" />
                                                 <span className="text-gray-700">{item.label}</span>
-                                            </Button>
+                                            </button>
                                         ))}
                                         
-                                        <Divider className="my-2" />
+                                        <div className="border-t border-gray-200 my-2" />
                                         
-                                        <Button
-                                            className="p-button-text w-full justify-start text-red-600 hover:bg-red-50 transition-colors"
+                                        <button
+                                            className="w-full flex items-center gap-3 p-3 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                             onClick={handleLogout}
-                                            loading={isLoggingOut}
                                             disabled={isLoggingOut}
                                         >
-                                            <LogOut size={18} className="mr-3" />
+                                            <LogOut size={18} />
                                             <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
-                                        </Button>
+                                        </button>
                                     </div>
                                 </div>
-                            </OverlayPanel>
+                            )}
                         </div>
                     </div>
                 </div>
             </header>
+
+            {/* Click outside to close dropdowns */}
+            {(notificationOpen || profileOpen) && (
+                <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => {
+                        setNotificationOpen(false);
+                        setProfileOpen(false);
+                    }}
+                />
+            )}
         </>
     );
 };
