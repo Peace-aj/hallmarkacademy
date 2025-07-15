@@ -16,33 +16,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const isActive = searchParams.get("isActive");
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
-
-    const skip = (page - 1) * limit;
 
     const where: any = {};
     if (category) where.category = category;
     if (isActive !== null) where.isActive = isActive === "true";
 
-    const [gallery, total] = await Promise.all([
-      prisma.gallery.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: [{ order: "asc" }, { createdAt: "desc" }],
-      }),
-      prisma.gallery.count({ where }),
-    ]);
+    const gallery = await prisma.gallery.findMany({
+      where,
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+    });
 
     return NextResponse.json({
       data: gallery,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: gallery.length,
     });
   } catch (error) {
     console.error("Error fetching gallery:", error);

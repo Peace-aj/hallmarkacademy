@@ -19,13 +19,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search");
     const category = searchParams.get("category");
     const schoolid = searchParams.get("schoolid");
-
-    const skip = (page - 1) * limit;
 
     const where: any = {};
     if (search) {
@@ -71,47 +67,37 @@ export async function GET(request: NextRequest) {
       // admin, super, management can see all subjects
     }
 
-    const [subjects, total] = await Promise.all([
-      prisma.subject.findMany({
-        where,
-        skip,
-        take: limit,
-        include: {
-          school: {
-            select: {
-              name: true,
-            }
-          },
-          teachers: {
-            select: {
-              id: true,
-              firstname: true,
-              surname: true,
-              title: true,
-            }
-          },
-          _count: {
-            select: {
-              teachers: true,
-              assignments: true,
-              lessons: true,
-              tests: true,
-            }
+    const subjects = await prisma.subject.findMany({
+      where,
+      include: {
+        school: {
+          select: {
+            name: true,
           }
         },
-        orderBy: { name: "asc" },
-      }),
-      prisma.subject.count({ where }),
-    ]);
+        teachers: {
+          select: {
+            id: true,
+            firstname: true,
+            surname: true,
+            title: true,
+          }
+        },
+        _count: {
+          select: {
+            teachers: true,
+            assignments: true,
+            lessons: true,
+            tests: true,
+          }
+        }
+      },
+      orderBy: { name: "asc" },
+    });
 
     return NextResponse.json({
       data: subjects,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: subjects.length,
     });
   } catch (error) {
     console.error("Error fetching subjects:", error);

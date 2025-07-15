@@ -18,37 +18,23 @@ const newsSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
     const category = searchParams.get("category");
     const status = searchParams.get("status");
     const featured = searchParams.get("featured");
-
-    const skip = (page - 1) * limit;
 
     const where: any = {};
     if (category) where.category = category;
     if (status) where.status = status;
     if (featured) where.featured = featured === "true";
 
-    const [news, total] = await Promise.all([
-      prisma.news.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { publishedAt: "desc" },
-      }),
-      prisma.news.count({ where }),
-    ]);
+    const news = await prisma.news.findMany({
+      where,
+      orderBy: { publishedAt: "desc" },
+    });
 
     return NextResponse.json({
       data: news,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: news.length,
     });
   } catch (error) {
     console.error("Error fetching news:", error);

@@ -20,13 +20,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
     const classId = searchParams.get("classId");
     const from = searchParams.get("from");
     const to = searchParams.get("to");
-
-    const skip = (page - 1) * limit;
 
     // Build where clause
     const where: any = {};
@@ -86,31 +82,21 @@ export async function GET(request: NextRequest) {
       // admin, super, management can see all events
     }
 
-    const [events, total] = await Promise.all([
-      prisma.event.findMany({
-        where,
-        skip,
-        take: limit,
-        include: {
-          class: {
-            select: {
-              name: true
-            }
+    const events = await prisma.event.findMany({
+      where,
+      include: {
+        class: {
+          select: {
+            name: true
           }
-        },
-        orderBy: { startTime: "asc" },
-      }),
-      prisma.event.count({ where }),
-    ]);
+        }
+      },
+      orderBy: { startTime: "asc" },
+    });
 
     return NextResponse.json({
       data: events,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: events.length,
     });
   } catch (error) {
     console.error("Error fetching events:", error);

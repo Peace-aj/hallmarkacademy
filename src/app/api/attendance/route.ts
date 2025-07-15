@@ -15,10 +15,6 @@ export async function GET(request: NextRequest) {
         const to = searchParams.get("to");
         const studentId = searchParams.get("studentId");
         const classId = searchParams.get("classId");
-        const page = parseInt(searchParams.get("page") || "1");
-        const limit = parseInt(searchParams.get("limit") || "50");
-
-        const skip = (page - 1) * limit;
 
         // Build where clause
         const where: any = {};
@@ -56,49 +52,39 @@ export async function GET(request: NextRequest) {
             // admin, super, management can see all
         }
 
-        const [attendance, total] = await Promise.all([
-            prisma.attendance.findMany({
-                where,
-                skip,
-                take: limit,
-                include: {
-                    student: {
-                        select: {
-                            id: true,
-                            firstname: true,
-                            surname: true,
-                            admissionnumber: true,
-                            class: {
-                                select: {
-                                    name: true
-                                }
-                            }
-                        }
-                    },
-                    lesson: {
-                        select: {
-                            name: true,
-                            subject: {
-                                select: {
-                                    name: true
-                                }
+        const attendance = await prisma.attendance.findMany({
+            where,
+            include: {
+                student: {
+                    select: {
+                        id: true,
+                        firstname: true,
+                        surname: true,
+                        admissionnumber: true,
+                        class: {
+                            select: {
+                                name: true
                             }
                         }
                     }
                 },
-                orderBy: { date: "desc" },
-            }),
-            prisma.attendance.count({ where }),
-        ]);
+                lesson: {
+                    select: {
+                        name: true,
+                        subject: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: { date: "desc" },
+        });
 
         return NextResponse.json({
             data: attendance,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit),
-            },
+            total: attendance.length,
         });
     } catch (error) {
         console.error("Error fetching attendance:", error);

@@ -19,11 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
     const classId = searchParams.get("classId");
-
-    const skip = (page - 1) * limit;
 
     // Build where clause
     const where: any = {};
@@ -75,31 +71,21 @@ export async function GET(request: NextRequest) {
       // admin, super, management can see all announcements
     }
 
-    const [announcements, total] = await Promise.all([
-      prisma.announcement.findMany({
-        where,
-        skip,
-        take: limit,
-        include: {
-          class: {
-            select: {
-              name: true
-            }
+    const announcements = await prisma.announcement.findMany({
+      where,
+      include: {
+        class: {
+          select: {
+            name: true
           }
-        },
-        orderBy: { date: "desc" },
-      }),
-      prisma.announcement.count({ where }),
-    ]);
+        }
+      },
+      orderBy: { date: "desc" },
+    });
 
     return NextResponse.json({
       data: announcements,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: announcements.length,
     });
   } catch (error) {
     console.error("Error fetching announcements:", error);

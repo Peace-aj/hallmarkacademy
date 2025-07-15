@@ -20,12 +20,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search");
     const level = searchParams.get("level");
-
-    const skip = (page - 1) * limit;
 
     const where: any = {};
     if (search) {
@@ -75,40 +71,30 @@ export async function GET(request: NextRequest) {
       // admin, super, management can see all classes
     }
 
-    const [classes, total] = await Promise.all([
-      prisma.class.findMany({
-        where,
-        skip,
-        take: limit,
-        include: {
-          formmaster: includeFormmaster ? {
-            select: {
-              id: true,
-              firstname: true,
-              surname: true,
-              title: true,
-            }
-          } : false,
-          _count: {
-            select: {
-              students: true,
-              lessons: true,
-            }
+    const classes = await prisma.class.findMany({
+      where,
+      include: {
+        formmaster: includeFormmaster ? {
+          select: {
+            id: true,
+            firstname: true,
+            surname: true,
+            title: true,
           }
-        },
-        orderBy: { name: "asc" },
-      }),
-      prisma.class.count({ where }),
-    ]);
+        } : false,
+        _count: {
+          select: {
+            students: true,
+            lessons: true,
+          }
+        }
+      },
+      orderBy: { name: "asc" },
+    });
 
     return NextResponse.json({
       data: classes,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: classes.length,
     });
   } catch (error) {
     console.error("Error fetching classes:", error);

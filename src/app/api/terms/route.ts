@@ -21,38 +21,24 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
     const status = searchParams.get("status");
     const session_param = searchParams.get("session");
-
-    const skip = (page - 1) * limit;
 
     const where: any = {};
     if (status) where.status = status;
     if (session_param) where.session = session_param;
 
-    const [terms, total] = await Promise.all([
-      prisma.term.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: [
-          { status: "desc" }, // Active terms first
-          { createdAt: "desc" }
-        ],
-      }),
-      prisma.term.count({ where }),
-    ]);
+    const terms = await prisma.term.findMany({
+      where,
+      orderBy: [
+        { status: "desc" }, // Active terms first
+        { createdAt: "desc" }
+      ],
+    });
 
     return NextResponse.json({
       data: terms,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+      total: terms.length,
     });
   } catch (error) {
     console.error("Error fetching terms:", error);
